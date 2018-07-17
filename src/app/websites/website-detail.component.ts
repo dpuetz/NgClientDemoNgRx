@@ -8,6 +8,9 @@ import { IMessage, Message } from '../shared/imessage';
 import { Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { PurchaseParameterService } from './purchase-parameter.service';
+import * as fromWebsites from './state/website.reducer';
+import * as websiteActions from './state/website.action';
+import { Store } from '@ngrx/store';
 
 
 @Component({
@@ -38,7 +41,8 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
                   private router: Router,
                   private websiteService: WebsiteService,
                   private fb: FormBuilder,
-                  private purchaseParams: PurchaseParameterService) {
+                  private purchaseParams: PurchaseParameterService,
+                  private store: Store<fromWebsites.State>) {
                     // Define all of the validation messages for the form.
                     this.validationMessages = {
                         url: {
@@ -113,6 +117,9 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
                 this.websiteForm.reset();  //resets validation values and empties values
             }
             this.website = website;
+            //store this as the selected website
+            this.store.dispatch(new websiteActions.SetCurrentWebsite(this.website));
+
         } else {
             this.website = new Website();
             this.popup = new Message('alert', 'Sorry, an error occurred while getting the website.', "", 0);

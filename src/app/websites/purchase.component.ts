@@ -6,7 +6,10 @@ import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/fo
 import { IMessage, Message } from '../shared/imessage';
 import { Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { PurchaseParameterService } from './purchase-parameter.service';
+// import { PurchaseParameterService } from './purchase-parameter.service';
+import * as fromWebsites from './state/website.reducer';
+import { Store, select } from '@ngrx/store';
+
 
 @Component({
   templateUrl: './purchase.component.html',
@@ -31,7 +34,8 @@ export class PurchaseComponent implements OnInit, OnDestroy {
         private router: Router,
         private websiteService: WebsiteService,
         private fb: FormBuilder,
-        private purchaseParams: PurchaseParameterService
+        // private purchaseParams: PurchaseParameterService,
+        private store: Store<fromWebsites.State>
     ) {
             this.navigationSubscription = this.router.events.subscribe((e: any) => {
                 // If it is a NavigationEnd event, then re-initalise the component
@@ -98,7 +102,13 @@ export class PurchaseComponent implements OnInit, OnDestroy {
             this.purchase = new Purchase();
             this.purchase.websiteID = this.websiteId;
 
-            this.websiteName = this.purchaseParams.websiteName;
+            //read websitename from store
+            this.store.pipe(select(fromWebsites.getCurrentWebsite))
+                        .subscribe(currentWebsite => {
+                            this.websiteName = currentWebsite.websiteName
+                        })//subscribe
+
+//this.websiteName = this.purchaseParams.websiteName;
             this.getPurchase(this.websiteId, purchaseId);
         });
 
