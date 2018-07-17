@@ -1,0 +1,124 @@
+
+body {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    padding:20px;
+    width: 100%;
+    height: 100%;
+    background: url(assets/road2.jpeg) no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+  }
+
+.container-wide {max-width:570px;}
+
+.header-style {text-align:center; margin-bottom:20px;}
+.header-link {color:red}
+
+.custom-nav{
+    background: #5bc0de;
+    color: #ffffff;
+    border-color: #5bc0de;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    padding:20px;
+}
+
+.panel{
+    border:none;
+    max-width:550px;
+}
+.smallFont{
+    font-weight:normal;
+    font-size:9px;
+}
+
+label{
+    display: inline-block;
+    max-width: 100%;
+    margin-bottom: 5px;
+    font-weight: normal;
+}
+
+th{
+    font-weight: normal;
+}
+.bottom-right-space {
+    padding-bottom: 5px;
+    padding-right: 5px;
+}
+
+.nav>li>a {
+    font-size:12px;
+    padding: 10px 30px 10px 0px;
+
+}
+.navbarCollapseNone{
+    padding-left:20px;
+}
+.navbar {
+    margin-bottom: 0px;
+}
+
+.required:after {
+    content:" *";
+    color:red;
+}
+
+/* start Spinner */
+    .spinner {
+    font-size:300%;
+    position:absolute;
+    top: 50%;
+    left: 50%;
+    z-index:10
+    }
+
+    .glyphicon-spin {
+        -webkit-animation: spin 1000ms infinite linear;
+        animation: spin 1000ms infinite linear;
+    }
+    @-webkit-keyframes spin {
+        0% {
+            -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+        }
+        100% {
+            -webkit-transform: rotate(359deg);
+            transform: rotate(359deg);
+        }
+    }
+    @keyframes spin {
+        0% {
+            -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+        }
+        100% {
+            -webkit-transform: rotate(359deg);
+            transform: rotate(359deg);
+        }
+    }
+
+/* end Spinner */
+
+
+/* Change Autocomplete styles in Chrome*/
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  border: 1px solid rgb(206, 212, 218);
+  -webkit-text-fill-color: #495057;
+  -webkit-box-shadow: 0 0 0px 1000px #fff inset;
+  transition: background-color 5000s ease-in-out 0s;
+  /* border: 1px solid green;
+  -webkit-text-fill-color: green;
+  -webkit-box-shadow: 0 0 0px 1000px #000 inset;
+  transition: background-color 5000s ease-in-out 0s; */
+}

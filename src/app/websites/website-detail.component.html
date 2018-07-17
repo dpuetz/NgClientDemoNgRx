@@ -1,0 +1,182 @@
+<message [popup]="popup" (complete)="onComplete($event)"></message>
+
+<div class="container container-wide">
+
+    <div class="panel">
+        <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div >
+                <!-- don't collapse the nav bar if there is only one option. just show it always -->
+                        <div class="navbar-header" *ngIf = "website.websiteID > 0"  >
+                          <button  type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                          </button>
+                        </div>
+                        <div [ngClass]="(website.websiteID > 0)?'collapse navbar-collapse':''" id="myNavbar">
+                          <ul class="nav navbar-nav">
+
+                            <li [ngClass]="(website.websiteID > 0)?'':'navbarCollapseNone'">
+                              <a [routerLink]="['/websites']">
+                                <i class="fa fa-angle-double-left "></i>
+                                Back</a>
+                            </li>
+                            <li *ngIf="website.websiteID > 0">
+                              <a [routerLink]="" (click)="openWebsite()">Launch Website</a>
+                            </li>
+                            <li *ngIf="website.websiteID > 0">
+                              <a routerLink="/websites/0/detail">Add New Website</a>
+                            </li>
+                            <li *ngIf="website.websiteID > 0">
+                              <a [routerLink]="['/websites', website.websiteID, 'purchase', 0]"
+                              [queryParams]="{ websiteName: website.websiteName}">Add New Purchase</a>
+                            </li>
+                          </ul>
+            </div>
+
+          </div>
+        </div>
+      </nav>
+
+    <div class="panel-body">
+
+
+    <div  *ngIf = "websiteNameDisplay" class="panel-header header-style">
+        <div class="website-header"><h4>Website name:  {{websiteNameDisplay}} </h4></div>
+    </div>
+
+        <form novalidate [formGroup]="websiteForm" (ngSubmit)="saveIt()">
+          <div class="form-group">
+            <label class="control-label" for="url">Website url:</label>
+
+            <input  class="form-control"
+                    id="url"
+                    type="text"
+                    placeholder="http://www."
+                    formControlName = "url" />
+            <div class="alert alert-danger" *ngIf ="urlMsg">
+                    {{urlMsg}}
+            </div>
+
+
+          </div>
+          <div class="form-group">
+            <label class="control-label required" for="websiteName">Website name:</label>
+            <input  class="form-control"
+                    id="websiteName"
+                    type="text"
+                    formControlName="websiteName" />
+                <div class="alert alert-danger" *ngIf="websiteNameMsg" >
+                        {{websiteNameMsg}}
+                </div>
+          </div>
+
+          <div class="form-group">
+            <label class="control-label" for="username">User name:</label>
+            <input  type="text"
+                    class="form-control"
+                    id="username"
+                    formControlName="username" />
+          </div>
+
+
+          <div class="form-group">
+            <label class="control-label" for="email">Email:</label>
+            <input type="email" class="form-control"id="email" formControlName="email" />
+          </div>
+
+          <div class="form-group">
+            <label class="control-label" for="password">Password:</label>
+            <input type="password" class="form-control" id="password" formControlName="password"  />
+          </div>
+
+          <div class="form-group">
+            <label class="control-label" for="notes">Notes:</label>
+            <textarea
+                    class="form-control"
+                    id="notes" formControlName="notes"
+            ></textarea>
+          </div>
+
+
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="pull-left right-space form-group">
+                <div class="checkbox checkbox-info">
+                  <input type="checkbox" id="preferred" formControlName="preferred" class="form-control styled"
+                  />
+                  <label for="preferred">Preferred</label>
+                </div>
+              </div>
+              <div class=" pull-left">
+
+                <div class="checkbox checkbox-info form-group">
+                  <input type="checkbox" id="isBill" formControlName="isBill" class="form-control styled "
+                  />
+                  <label for="isBill">Bills</label>
+                </div>
+              </div>
+
+            </div>
+            <!-- col-sm-12 -->
+          </div>
+          <!-- row -->
+
+        <div class="form-group">
+        <div class="row" >
+        <div style="margin-left:20px;">
+                <div class="pull-left bottom-right-space">
+                    <button class="btn btn-info" [disabled]="!websiteForm.valid"
+                        type="submit">Save</button>
+                </div>
+                <div class="pull-left bottom-right-space" *ngIf = "website.websiteID > 0" >
+                    <button class="btn btn-info" type="button" (click)="deleteIt();">Delete</button>
+                </div>
+                <div class="pull-left bottom-right-space" >
+                    <button class="btn btn-info"  type="button" routerLink = "/websites">Cancel</button>
+                </div>
+        </div>
+        </div>
+        </div>
+
+          <div class="form-group">
+            <div *ngIf="website.websiteID > 0"  style="text-align:right;margin-bottom:10px;">
+              <a [routerLink]="['/websites', website.websiteID, 'purchase', 0]"
+                 [queryParams]="{ websiteName: website.websiteName}">Add New Purchase</a>
+            </div>
+
+            <div class="table-responsive">
+              <table *ngIf="website.lstPurchases.length > 0" class="table table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Purchased</th>
+                    <th>Received</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let purchase of website.lstPurchases"
+                        [routerLink]="['/websites', website.websiteID, 'purchase', purchase.purchaseID]"
+                        [queryParams] = "{websiteName: website.websiteName}">
+                      <td>{{purchase.productName}}</td>
+                      <td>{{purchase.purchasedOn}}</td>
+                      <td>{{purchase.arrivedOn}}</td>
+                    </tr>
+
+                </tbody>
+              </table>
+            </div>
+
+
+          </div>
+
+
+        </form>
+      </div>
+      <!--panel-body-->
+    </div>
+    <!--panel-->
+
+</div>
+<!-- container -->

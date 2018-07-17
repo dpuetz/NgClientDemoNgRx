@@ -1,0 +1,106 @@
+<message [popup]="popup" (complete)="onComplete($event)"></message>
+
+<div class="container container-wide">
+
+
+
+<div class="panel" >
+        <nav class="navbar navbar-default ">
+                <div class="container-fluid  ">
+                    <ul class="nav navbar-nav ">
+                      <li class="navbarCollapseNone" >
+                        <a routerLink="/websites/0/detail">Add New Website</a>
+                      </li>
+                    </ul>
+                </div>
+        </nav>
+<div class="panel-body">
+
+<form [formGroup]="searchForm" (ngSubmit)="doSearch()">
+    <div class="form-group">
+        <div class="input-group">
+              <input type="text"
+                    class="form-control"
+                    placeholder="Search for..."
+                    formControlName="searchWord"
+                    />
+                <span class="input-group-btn" >
+                <button type="submit" class="btn btn-info">
+                    Go!
+                </button>
+                </span>
+        </div> <!--input-group-->
+</div> <!--form-group-->
+
+<div class="row">
+    <div class="col-sm-12">
+            <div class="pull-left right-space ">
+                    <div class="checkbox checkbox-info" >
+                        <input type="checkbox"
+                            id="isPreferred"
+                            formControlName="isPreferred"
+                            class="styled"
+                            />
+                        <label for="isPreferred">Preferred sites</label>
+                    </div>
+            </div>
+
+            <div class=" pull-left">
+                    <div class="checkbox checkbox-info ">
+                        <input type="checkbox"
+                            id="isBill"
+                            formControlName="isBill"
+                            class="styled"
+                            />
+                        <label for="isBill">Monthly Bills</label>
+                    </div>
+            </div>
+
+    </div><!-- col-sm-12 -->
+    </div><!-- row -->
+<div *ngIf="search">{{search | json}}</div>
+
+    <div class="container-fluid" >
+        <div class="row">
+            <div class="pull-right horiz-padding" style="margin-right:20px;">
+                <label class="control-label">Records:</label>
+                <label class="control-label" >{{recordsReturned}}</label>
+            </div>
+        </div>
+        <div class="table-responsive" *ngIf="websites && websites.length > 0">
+         <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th >Pref</th>
+                        <th >Bill</th>
+                        <th >Website Name</th>
+                    </tr>
+                </thead>
+                <tbody >
+                    <tr *ngFor="let website of websites"
+                        [routerLink] = "['/websites', website.websiteID, 'detail']">
+                       <td><i *ngIf = "website.preferred" class="fa fa-check smallFont"></i></td>
+                       <td><i *ngIf = "website.isBill" class="fa fa-check smallFont"></i></td>
+                       <td class="websiteName">{{website.websiteName}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div> <!-- container-fluid -->
+
+
+
+
+
+
+
+
+
+
+
+
+</form>
+</div> <!--panel-body-->
+</div> <!--panel-->
+</div> <!-- container -->

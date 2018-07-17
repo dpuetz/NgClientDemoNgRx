@@ -1,0 +1,122 @@
+
+<message [popup]="popup" (complete)="onComplete($event)"></message>
+
+<div class="container container-wide">
+
+<div class="panel" >
+        <nav class="navbar navbar-default ">
+                <div class="container-fluid">
+                    <ul class="nav navbar-nav">
+                      <li class="navbarCollapseNone">
+                        <a  [routerLink] = "['/websites', websiteId, 'detail']">
+                          <i class="fa fa-angle-double-left"></i>
+                          Back</a>
+                      </li>
+                    </ul>
+                </div>
+          </nav>
+
+<div class="panel-header header-style">
+    <div class="website-header"><h4>Purchase for {{websiteName}}</h4></div>
+</div>
+
+
+<div class="panel-body">
+
+        <form [formGroup]="purchaseForm" (ngSubmit)="saveIt()" >
+                <div class="form-group">
+                        <label class="control-label required" for="productName">Purchase name:</label>
+                        <input type="text"
+                            class="form-control"
+                            id="productName"
+                            formControlName="productName" />
+                            <div *ngIf ="productNameMsg" class="alert alert-danger">
+                                    {{productNameMsg}}
+                            </div>
+                </div>
+
+                      <div class="form-group">
+                        <label class="control-label" for="purchasedOn">Date purchased:</label>
+                        <div class="input-group">
+                            <input type="text"
+                                class="form-control"
+                                a2e-datetimepicker
+                                [options]="a2eOptions"
+                                id="purchasedOn"
+                                formControlName="purchasedOn" />
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                        </div>
+                      </div>
+
+                      <div class="form-group">
+                            <label class="control-label" for="arrivedOn">Date received:</label>
+                            <div class="input-group">
+                                <input type="text"
+                                    class="form-control"
+                                    a2e-datetimepicker
+                                    [options]="a2eOptions"
+                                    id="arrivedOn"
+                                    formControlName="arrivedOn" />
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                            </div>  <!-- datepicker -->
+                      </div> <!-- form-group -->
+
+                        <div class="form-group">
+                            <label class="control-label" for="totalAmount">Total paid:</label>
+                         <div class="input-group">
+                            <span class="input-group-addon">$</span>
+                            <input type="text"
+                                class="form-control"
+                                id="totalAmount"
+                                formControlName="totalAmount"
+                                currencyMask />
+                        </div> <!-- input-group    -->
+                        </div> <!-- form-group    -->
+
+                      <div class="form-group">
+                        <label class="control-label" for="shippingAmount">Shipping paid:</label>
+                <div class="input-group">
+                        <span class="input-group-addon">$</span>
+                        <input type="text"
+                            class="form-control"
+                            id="shippingAmount"
+                            formControlName="shippingAmount"
+                            currencyMask />
+                    </div> <!-- input-group    -->
+                      </div><!-- form-group    -->
+
+                      <div class="form-group">
+                            <label class="control-label" for="notes">Notes:</label>
+                            <textarea type="text"
+                                class="form-control"
+                                id="notes"
+                                formControlName="notes">
+                                </textarea>
+                      </div>
+
+
+  <div class="form-group">
+      <div class="row" >
+      <div style="margin-left:20px;">
+                    <div class="pull-left bottom-right-space"  >
+                      <button class="btn btn-info "
+                            type="submit"
+                            [disabled]="!purchaseForm.valid">Save</button>
+                    </div>
+                    <div class="pull-left bottom-right-space " >
+                      <button class="btn btn-info" type="button" (click)="deleteIt();"  *ngIf = "purchase.purchaseID">Delete</button>
+                    </div>
+                    <div class="pull-left bottom-right-space" >
+                      <button class="btn btn-info"  type="button"
+                            [routerLink] = "['/websites', websiteId, 'detail']">
+                            Cancel</button>
+                    </div>
+      </div>
+      </div>
+      </div>
+
+        </form>
+</div> <!--panel-body-->
+</div> <!--panel-->
+
+</div> <!-- container -->

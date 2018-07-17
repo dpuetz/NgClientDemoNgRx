@@ -1,0 +1,69 @@
+
+<message [popup]="popup" (complete)="onComplete($event)"></message>
+
+<div class="container container-wide "  >
+<div class="panel">
+
+<div class="panel-heading" >
+    <h1>Login</h1>
+</div>
+
+<div class="panel-body">
+<div class="row">
+
+    <div class="col-sm-4 hidden-xs">
+        <img [src]="'assets/cat.jpg'"  alt="login" class="img-responsive"  />
+    </div>
+    <div class="col-sm-8">
+
+        <form [formGroup]="loginForm" (ngSubmit)="loginIn()"
+              novalidate
+              class="form">
+            <div class="form-group">
+                <label class="control-label">User name</label>
+                <input type="text"
+                       name="username"
+                       class="form-control"
+                       placeholder="User name"
+                       formControlName="username"
+                        />
+                <div *ngIf = "usernameMsg" class="alert alert-danger">
+                        {{usernameMsg}}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password" class="control-label">Password</label>
+                <input type="password"
+                    id="password"
+                    class="form-control"
+                    placeholder="Password"
+                    formControlName="password"
+                    />
+                <div *ngIf = "passwordMsg" class="alert alert-danger">
+                        {{passwordMsg}}
+                </div>
+        </div>
+
+            <div class="form-group" >
+                    <button type="submit"
+                            [disabled] = "!loginForm.valid"
+                            class="btn btn-info" >
+                            Login
+                    </button>
+            </div>
+
+        </form>
+    </div>
+
+
+</div><!--row-->
+</div> <!--panel-body-->
+
+
+
+
+
+
+</div> <!--panel-->
+</div>  <!-- container -->
