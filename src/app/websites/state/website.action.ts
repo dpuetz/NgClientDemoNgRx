@@ -6,7 +6,10 @@ export enum WebsiteActionTypes {
     SetSearchParams = '[Website] Get Search Params',
     SetCurrentWebsite = '[Website] Set Current Website',
     ClearCurrentWebsite = '[Website] Clear Current Website',
-    InitializeCurrentWebsite = '[Website] Initialize Current Website'
+    InitializeCurrentWebsite = '[Website] Initialize Current Website',
+    Load = '[Website] Load',
+    LoadSuccess = '[Website] Load Success',
+    LoadFail = '[Website] Load Fail'
 }
 
 export class SetSearchParams implements Action {
@@ -29,7 +32,25 @@ export class InitializeCurrentWebsite implements Action {
     constructor (){}  //no payload
 }
 
+export class Load implements Action {
+    readonly type = WebsiteActionTypes.Load
+    constructor (public payload: ISearch){}
+}
+
+export class LoadSuccess implements Action {
+    readonly type = WebsiteActionTypes.LoadSuccess
+    constructor (public payload: IWebsite[]){}
+}
+
+export class LoadFail implements Action {
+    readonly type = WebsiteActionTypes.LoadFail
+    constructor (public payload: string){}
+}
+
 export type WebsiteActions = SetSearchParams
         | SetCurrentWebsite
         | ClearCurrentWebsite
-        | InitializeCurrentWebsite;
+        | InitializeCurrentWebsite
+        | Load
+        | LoadSuccess
+        | LoadFail;

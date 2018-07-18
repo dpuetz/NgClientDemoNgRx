@@ -16,7 +16,8 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { PurchaseParameterService } from './purchase-parameter.service';
 import { StoreModule } from '@ngrx/store';
 import { reducer } from '../websites/state/website.reducer';
-
+import { EffectsModule } from '@ngrx/effects';
+import { WebsiteEffects } from './state/websites.effects';
 
 export const CustomCurrencyMaskConfig: CurrencyMaskConfig = {
   align: "left",
@@ -90,12 +91,16 @@ imports: [
     SharedModule,
     ReactiveFormsModule,
     // StoreModule.forFeature('websites', {}),
-    StoreModule.forFeature('websites', reducer)  //1st arg is slice, 2nd is reducer or reducers.
+    StoreModule.forFeature('websites', reducer),  //1st arg is slice, 2nd is reducer or reducers.
+    EffectsModule.forFeature(
+      [ WebsiteEffects ]
+    )
   ],
   declarations: [
     WebsitesComponent,
     WebsiteDetailComponent,
     PurchaseComponent
+
 
   ],
 
@@ -106,6 +111,7 @@ imports: [
     }
     , WebsiteService
     , PurchaseParameterService
+
 ]
 
 })

@@ -34,7 +34,6 @@ export class WebsiteService {
     private purchaseUrl: string;
 
     constructor(private http: HttpClient) {
-
         this.searchUrl = this.domain + 'api/websitesearch';
         this.websiteUrl = this.domain + 'api/websites';
         this.purchaseUrl = this.domain + 'api/Purchases';
@@ -53,7 +52,8 @@ export class WebsiteService {
         return this.http
             .get<HttpResponse<IWebsite[]>>(url, {headers, params, observe: 'response' })
             .pipe (
-                tap( val => this.log(`getWebsites status: ${val.status}, ok: ${val.ok}, statusText: ${val.statusText}, type: ${val.type}, url: ${val.url} `)),
+                tap( val => this.log(`getWebsites status: ${val.status}, ok: ${val.ok}, statusText: ${val.statusText}, type: ${val.type}, url: ${val.url}`)),
+                // tap(val => this.log('getWebsites stringified = ' + JSON.stringify(val, null, 4))),
                 map( val=> val.body),
                 catchError(this.handleError('getWebsites', null) )
             ); //pipe

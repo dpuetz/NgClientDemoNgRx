@@ -20,6 +20,7 @@
     "@angular/platform-browser": "^6.0.2",
     "@angular/platform-browser-dynamic": "^6.0.2",
     "@angular/router": "^6.0.2",
+    "@ngrx/effects": "^6.0.1",
     "@ngrx/store": "^6.0.1",
     "angular-font-awesome": "^3.1.2",
     "bootbox": "^4.4.0",

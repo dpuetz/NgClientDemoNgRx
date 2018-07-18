@@ -4,11 +4,10 @@ import { WebsiteService } from './website.service';
 import { ISearch } from './ISearch';
 import { IMessage, Message } from '../shared/imessage';
 import { FormGroup, FormBuilder } from '@angular/forms';
-// import { Subscription } from 'rxjs';
-// import { debounceTime } from 'rxjs/operators';
 import { Store, select } from '@ngrx/store';
 import * as fromWebsites from './state/website.reducer';
 import * as websiteActions from './state/website.action';
+import { takeWhile } from 'rxjs/operators';
 
 @Component({
     templateUrl: './websites.component.html'
@@ -20,8 +19,6 @@ export class WebsitesComponent implements OnInit, OnDestroy {
     search: ISearch;
     recordsReturned: number = 0;
     popup : IMessage;
-    // subIsBill: Subscription;
-    // subIsPreferred: Subscription;
     searchForm: FormGroup;
     componentActive = true;
 
@@ -30,42 +27,31 @@ export class WebsitesComponent implements OnInit, OnDestroy {
                  private store: Store<fromWebsites.State>  ) { }
 
     ngOnInit() {
+        this.store
+            .pipe(
+                    select(fromWebsites.getSearchParams),
+                    takeWhile(() => this.componentActive)
+                )//pipe
+                .subscribe(searchParams => {
+                    this.search = searchParams
+                })//subscribe
 
-        this.store.pipe(select(fromWebsites.getSearchParams))
-                    .subscribe(searchParams => {
-                        this.search = searchParams
-                    })//subscribe
-
-        // this.store.pipe(select('websites')).subscribe(
-        //     search => {
-        //             this.search = search.searchParams
-        //     }
-        // )//subscribe
+        this.store
+            .pipe(
+                    select(fromWebsites.getWebsites),
+                    takeWhile(() => this.componentActive)
+                )//pipe
+                .subscribe(websites => {
+                    this.websites = websites
+                })//subscribe
 
         this.searchForm = this.fb.group({
             searchWord: this.search.searchWord,
             isBill: this.search.isBill,
             isPreferred: this.search.isPreferred
         });
-
-        // const isBillControl = this.searchForm.get('isBill');
-        // this.subIsBill = isBillControl.valueChanges
-        //         .pipe(debounceTime(100))
-        //         .subscribe(() => {
-        //                     this.doCheckSearch();
-        //                 }
-        // );
-        // const isPreferredControl = this.searchForm.get('isPreferred');
-        // this.subIsPreferred = isPreferredControl.valueChanges
-        //         .pipe(debounceTime(100))
-        //         .subscribe(() =>
-        //                     this.doCheckSearch()
-        //         ); //subscribe
-
         this.getWebsites();
     }
-
-    onComplete(event:any): void {}
 
     searchCheckboxChanged() {
         this.doCheckSearch();
@@ -75,7 +61,7 @@ export class WebsitesComponent implements OnInit, OnDestroy {
         this.getWebsites();
     }
     doCheckSearch(): void   {
-        //update display on form
+        //update display on form, set searchword to ''
         this.searchForm.patchValue({
             searchWord: ''
         });
@@ -83,23 +69,11 @@ export class WebsitesComponent implements OnInit, OnDestroy {
     }
 
     getWebsites():void {
-        let searchParams = Object.assign({}, this.search, this.searchForm.value);
+        // let searchParams = Object.assign({}, this.search, this.searchForm.value);
+        let searchParams = {...this.search, ...this.searchForm.value};
         this.store.dispatch(new websiteActions.SetSearchParams(searchParams));
-        // this.store.dispatch({
-        //     type: 'SAVE_SEARCH_CRITERIA',
-        //     payload: searchParams
-        // });
-        this.websiteService.getWebsites(searchParams)
-            .subscribe(websites =>
-            {
-                if (websites) {
-                    this.websites = websites;
-                    this.recordsReturned = websites.length;
-                } else {
-                    this.getError();
-                }
-            }); //subscribe
-    }
+        this.store.dispatch(new websiteActions.Load(searchParams));
+    }//getWebsites
 
     getError():void {
         console.log("err");
@@ -108,15 +82,7 @@ export class WebsitesComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
 		this.componentActive = false;
-	} //ngOnDestroy
+	}
 
-    //  ngOnDestroy() {
-    //         if (this.subIsBill) {
-    //             this.subIsBill.unsubscribe();
-    //         }
-    //         if (this.subIsPreferred) {
-    //             this.subIsPreferred.unsubscribe();
-    //         }
-    //  } //ngOnDestroy
 
 } //class

@@ -14,14 +14,16 @@ export interface State extends fromRoot.State {
 export interface WebsiteState {
     searchParams: ISearch,
     websites: IWebsite[],
-    currentWebsite: IWebsite
+    currentWebsite: IWebsite,
+    error: string
 }
 
 //set an initial state so never any undefined
 const initialState: WebsiteState = {
     searchParams: new Search(),  //contains correct defaults
     websites: [],
-    currentWebsite: null
+    currentWebsite: null,
+    error: ''
 }
 
 //Create a const for the entire feature slice
@@ -40,18 +42,6 @@ export const getCurrentWebsite = createSelector (
     getWebsiteFeatureState,
     state => state.currentWebsite
 );
-
-// export function reducer (state, action) {
-//     switch (action.type) {
-//         case 'SAVE_SEARCH_CRITERIA':
-//             return {
-//                 ...state,
-//                 website: action.payload
-//             }
-//         default:
-//             return state;
-//     }//switch
-// }//function
 
 export function reducer (state = initialState, action: WebsiteActions): WebsiteState {
     switch (action.type) {
@@ -77,6 +67,17 @@ export function reducer (state = initialState, action: WebsiteActions): WebsiteS
             return {
                 ...state,
                 currentWebsite: new Website()
+            }
+        case WebsiteActionTypes.LoadSuccess:
+            return {
+                ...state,
+                websites: action.payload
+            }
+        case WebsiteActionTypes.LoadFail:
+            return {
+                ...state,
+                websites: [],
+                error: action.payload
             }
         default:
             return state;

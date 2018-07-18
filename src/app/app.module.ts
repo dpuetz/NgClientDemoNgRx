@@ -11,6 +11,8 @@ import { SharedModule } from './shared/shared.module';
 import { RouterModule, PreloadAllModules } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AppHeaderComponent } from './shared/app-header';
+import { EffectsModule } from '@ngrx/effects';
+
 // import { reducer } from './state/app.reducer';
 
 @NgModule({
@@ -21,6 +23,7 @@ import { AppHeaderComponent } from './shared/app-header';
     AngularFontAwesomeModule,
     HttpClientModule,
     ReactiveFormsModule,
+    EffectsModule.forRoot([]),
     StoreModule.forRoot({}),
     RouterModule.forRoot([
         { path: 'login', component: LoginComponent },
