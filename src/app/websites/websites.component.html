@@ -2,8 +2,6 @@
 
 <div class="container container-wide">
 
-
-
 <div class="panel" >
         <nav class="navbar navbar-default ">
                 <div class="container-fluid  ">
@@ -60,7 +58,6 @@
 
     </div><!-- col-sm-12 -->
     </div><!-- row -->
-<div *ngIf="search">{{search | json}}</div>
 
     <div class="container-fluid" >
         <div class="row">
@@ -79,8 +76,9 @@
                     </tr>
                 </thead>
                 <tbody >
+                     <!-- [routerLink] = "['/websites', website.websiteID, 'detail']" -->
                     <tr *ngFor="let website of websites"
-                        [routerLink] = "['/websites', website.websiteID, 'detail']">
+                        (click) = "goToSelectedWebsite(website)">
                        <td><i *ngIf = "website.preferred" class="fa fa-check smallFont"></i></td>
                        <td><i *ngIf = "website.isBill" class="fa fa-check smallFont"></i></td>
                        <td class="websiteName">{{website.websiteName}}</td>

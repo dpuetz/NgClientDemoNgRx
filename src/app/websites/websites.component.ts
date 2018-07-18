@@ -8,6 +8,7 @@ import { Store, select } from '@ngrx/store';
 import * as fromWebsites from './state/website.reducer';
 import * as websiteActions from './state/website.action';
 import { takeWhile } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
 @Component({
     templateUrl: './websites.component.html'
@@ -24,7 +25,8 @@ export class WebsitesComponent implements OnInit, OnDestroy {
 
     constructor( private websiteService: WebsiteService,
                  private fb: FormBuilder,
-                 private store: Store<fromWebsites.State>  ) { }
+                 private store: Store<fromWebsites.State>,
+                 private router: Router,  ) { }
 
     ngOnInit() {
         this.store
@@ -78,6 +80,11 @@ export class WebsitesComponent implements OnInit, OnDestroy {
     getError():void {
         console.log("err");
         this.popup = new Message('alert', 'Sorry, an error has occurred while getting the data.', "", 0);
+    }
+
+    goToSelectedWebsite(website): void {
+        this.store.dispatch(new websiteActions.SetCurrentWebsite(website));
+        this.router.navigate(['/websites', website.websiteID, 'detail']);
     }
 
     ngOnDestroy() {
