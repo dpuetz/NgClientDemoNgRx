@@ -5,8 +5,8 @@ import { WebsiteService } from './website.service';
 import { IWebsite, Website } from './IWebsite';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';  //NgForm,
 import { IMessage, Message } from '../shared/imessage';
-import { Subscription } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+// import { Subscription } from 'rxjs';
+import { debounceTime, takeWhile } from 'rxjs/operators';
 import { PurchaseParameterService } from './purchase-parameter.service';
 import * as fromWebsites from './state/website.reducer';
 import * as websiteActions from './state/website.action';
@@ -24,6 +24,7 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
     websiteForm: FormGroup;
     websiteNameMsg:string;
     urlMsg: string;
+    componentActive = true;
 
     get websiteNameDisplay (): string {
         return this.purchaseParams.websiteName;
@@ -33,9 +34,9 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
     }
 
     private validationMessages: { [key: string]: { [key: string]: string } };
-    private sub: Subscription;
-    private subWebsiteName: Subscription;
-    private subUrl: Subscription;
+    // private sub: Subscription;
+    // private subWebsiteName: Subscription;
+    // private subUrl: Subscription;
 
     constructor(  private route: ActivatedRoute,
                   private router: Router,
@@ -67,26 +68,52 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
             isBill: false
         });  //websiteForm
 
+        // const urlControl = this.websiteForm.get('url');
+        // this.subUrl = urlControl.valueChanges
+        //         .pipe(debounceTime(1000))
+        //         .subscribe(value =>
+        //                 this.setMessage(urlControl, 'url')
+        // );
         const urlControl = this.websiteForm.get('url');
-        this.subUrl = urlControl.valueChanges
-                .pipe(debounceTime(1000))
+        urlControl.valueChanges
+                .pipe(
+                    debounceTime(1000),
+                    takeWhile(() => this.componentActive)
+                )//pipe
                 .subscribe(value =>
                         this.setMessage(urlControl, 'url')
         );
 
+        // const websiteNameControl = this.websiteForm.get('websiteName');
+        // this.subWebsiteName = websiteNameControl.valueChanges
+        //         // .pipe(debounceTime(1000))
+        //         .subscribe(value => {
+        //                     this.websiteNameDisplay = value;
+        //                     this.setMessage(websiteNameControl, 'websiteName');
+        //                 }
+        // );
         const websiteNameControl = this.websiteForm.get('websiteName');
-        this.subWebsiteName = websiteNameControl.valueChanges
+        websiteNameControl.valueChanges
                 // .pipe(debounceTime(1000))
+                .pipe(
+                    debounceTime(1000),
+                    takeWhile(() => this.componentActive)
+                )//pipe
                 .subscribe(value => {
-                            this.websiteNameDisplay = value;
-                            this.setMessage(websiteNameControl, 'websiteName');
-                        }
-        );
+                    this.websiteNameDisplay = value;
+                    this.setMessage(websiteNameControl, 'websiteName');
+                }); //subscribe
 
-        this.sub = this.route.data.subscribe(  //https://angular.io/guide/router says that unsubscribing to activated route in unnecessary
-            data => this.onResolved(data['website'])
-        );
-
+        // this.sub = this.route.data.subscribe(  //https://angular.io/guide/router says that unsubscribing to activated route in unnecessary
+        //     data => this.onResolved(data['website'])
+        // );
+        this.route.data
+            .pipe(
+                takeWhile(() => this.componentActive)
+            )//pipe
+            .subscribe(  //https://angular.io/guide/router says that unsubscribing to activated route is unnecessary
+                data => this.onResolved(data['website'])
+            ); //subscribe
     }//ngOnInit
 
 
@@ -216,9 +243,10 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
     }
 
     ngOnDestroy(): void {
-        this.sub.unsubscribe();
-        this.subWebsiteName.unsubscribe();
-        this.subUrl.unsubscribe();
+        // this.sub.unsubscribe();
+        // this.subWebsiteName.unsubscribe();
+        // this.subUrl.unsubscribe();
+        this.componentActive = false;
     }
 
   }//class
