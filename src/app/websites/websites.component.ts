@@ -20,9 +20,10 @@ export class WebsitesComponent implements OnInit, OnDestroy {
     search: ISearch;
     recordsReturned: number = 0;
     popup : IMessage;
-    subIsBill: Subscription;
-    subIsPreferred: Subscription;
+    // subIsBill: Subscription;
+    // subIsPreferred: Subscription;
     searchForm: FormGroup;
+    componentActive = true;
 
     constructor( private websiteService: WebsiteService,
                  private fb: FormBuilder,
@@ -47,25 +48,28 @@ export class WebsitesComponent implements OnInit, OnDestroy {
             isPreferred: this.search.isPreferred
         });
 
-        const isBillControl = this.searchForm.get('isBill');
-        this.subIsBill = isBillControl.valueChanges
-                .pipe(debounceTime(100))
-                .subscribe(() => {
-
-                            this.doCheckSearch();
-                        }
-        );
-        const isPreferredControl = this.searchForm.get('isPreferred');
-        this.subIsPreferred = isPreferredControl.valueChanges
-                .pipe(debounceTime(100))
-                .subscribe(() =>
-                            this.doCheckSearch()
-                ); //subscribe
+        // const isBillControl = this.searchForm.get('isBill');
+        // this.subIsBill = isBillControl.valueChanges
+        //         .pipe(debounceTime(100))
+        //         .subscribe(() => {
+        //                     this.doCheckSearch();
+        //                 }
+        // );
+        // const isPreferredControl = this.searchForm.get('isPreferred');
+        // this.subIsPreferred = isPreferredControl.valueChanges
+        //         .pipe(debounceTime(100))
+        //         .subscribe(() =>
+        //                     this.doCheckSearch()
+        //         ); //subscribe
 
         this.getWebsites();
     }
 
     onComplete(event:any): void {}
+
+    searchCheckboxChanged() {
+        this.doCheckSearch();
+    }
 
     doSearch(): void
     {
@@ -103,13 +107,18 @@ export class WebsitesComponent implements OnInit, OnDestroy {
         console.log("err");
         this.popup = new Message('alert', 'Sorry, an error has occurred while getting the data.', "", 0);
     }
-     ngOnDestroy() {
-            if (this.subIsBill) {
-                this.subIsBill.unsubscribe();
-            }
-            if (this.subIsPreferred) {
-                this.subIsPreferred.unsubscribe();
-            }
-     } //ngOnDestroy
+
+    ngOnDestroy() {
+		this.componentActive = false;
+	} //ngOnDestroy
+
+    //  ngOnDestroy() {
+    //         if (this.subIsBill) {
+    //             this.subIsBill.unsubscribe();
+    //         }
+    //         if (this.subIsPreferred) {
+    //             this.subIsPreferred.unsubscribe();
+    //         }
+    //  } //ngOnDestroy
 
 } //class

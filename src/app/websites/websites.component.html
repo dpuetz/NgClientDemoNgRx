@@ -40,6 +40,7 @@
                             id="isPreferred"
                             formControlName="isPreferred"
                             class="styled"
+                            (change) = "searchCheckboxChanged()"
                             />
                         <label for="isPreferred">Preferred sites</label>
                     </div>
@@ -51,6 +52,7 @@
                             id="isBill"
                             formControlName="isBill"
                             class="styled"
+                            (change)="searchCheckboxChanged()"
                             />
                         <label for="isBill">Monthly Bills</label>
                     </div>
