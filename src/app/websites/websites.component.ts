@@ -1,11 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Website } from './IWebsite'
 import { WebsiteService } from './website.service';
-import { ISearch, Search } from './ISearch';
+import { ISearch } from './ISearch';
 import { IMessage, Message } from '../shared/imessage';
 import { FormGroup, FormBuilder } from '@angular/forms';
-import { Subscription } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+// import { Subscription } from 'rxjs';
+// import { debounceTime } from 'rxjs/operators';
 import { Store, select } from '@ngrx/store';
 import * as fromWebsites from './state/website.reducer';
 import * as websiteActions from './state/website.action';
@@ -71,12 +71,10 @@ export class WebsitesComponent implements OnInit, OnDestroy {
         this.doCheckSearch();
     }
 
-    doSearch(): void
-    {
+    doSearch(): void  {
         this.getWebsites();
     }
-    doCheckSearch(): void
-    {
+    doCheckSearch(): void   {
         //update display on form
         this.searchForm.patchValue({
             searchWord: ''
