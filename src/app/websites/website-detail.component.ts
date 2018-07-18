@@ -1,17 +1,14 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-
 import { WebsiteService } from './website.service';
 import { IWebsite, Website } from './IWebsite';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';  //NgForm,
 import { IMessage, Message } from '../shared/imessage';
-// import { Subscription } from 'rxjs';
 import { debounceTime, takeWhile } from 'rxjs/operators';
 import { PurchaseParameterService } from './purchase-parameter.service';
 import * as fromWebsites from './state/website.reducer';
 import * as websiteActions from './state/website.action';
-import { Store } from '@ngrx/store';
-
+import { Store, select } from '@ngrx/store';
 
 @Component({
     templateUrl: './website-detail.component.html'
@@ -34,9 +31,6 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
     }
 
     private validationMessages: { [key: string]: { [key: string]: string } };
-    // private sub: Subscription;
-    // private subWebsiteName: Subscription;
-    // private subUrl: Subscription;
 
     constructor(  private route: ActivatedRoute,
                   private router: Router,
@@ -68,12 +62,6 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
             isBill: false
         });  //websiteForm
 
-        // const urlControl = this.websiteForm.get('url');
-        // this.subUrl = urlControl.valueChanges
-        //         .pipe(debounceTime(1000))
-        //         .subscribe(value =>
-        //                 this.setMessage(urlControl, 'url')
-        // );
         const urlControl = this.websiteForm.get('url');
         urlControl.valueChanges
                 .pipe(
@@ -84,14 +72,6 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
                         this.setMessage(urlControl, 'url')
         );
 
-        // const websiteNameControl = this.websiteForm.get('websiteName');
-        // this.subWebsiteName = websiteNameControl.valueChanges
-        //         // .pipe(debounceTime(1000))
-        //         .subscribe(value => {
-        //                     this.websiteNameDisplay = value;
-        //                     this.setMessage(websiteNameControl, 'websiteName');
-        //                 }
-        // );
         const websiteNameControl = this.websiteForm.get('websiteName');
         websiteNameControl.valueChanges
                 // .pipe(debounceTime(1000))
@@ -104,16 +84,14 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
                     this.setMessage(websiteNameControl, 'websiteName');
                 }); //subscribe
 
-        // this.sub = this.route.data.subscribe(  //https://angular.io/guide/router says that unsubscribing to activated route in unnecessary
-        //     data => this.onResolved(data['website'])
-        // );
-        this.route.data
-            .pipe(
-                takeWhile(() => this.componentActive)
-            )//pipe
-            .subscribe(  //https://angular.io/guide/router says that unsubscribing to activated route is unnecessary
-                data => this.onResolved(data['website'])
-            ); //subscribe
+        this.getCurrentWebsite();
+        // this.route.data
+        //     .pipe(
+        //         takeWhile(() => this.componentActive)
+        //     )//pipe
+        //     .subscribe(  //https://angular.io/guide/router says that unsubscribing to activated route is unnecessary
+        //         data => this.onResolved(data['website'])
+        //     ); //subscribe
     }//ngOnInit
 
 
@@ -138,15 +116,22 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
     } //setMessage
 
     /////////getting
+    getCurrentWebsite() {
+        this.store
+            .pipe(
+                    select(fromWebsites.getCurrentWebsite),
+                    takeWhile(() => this.componentActive)
+                )//pipe
+                .subscribe(website => {
+                    this.onResolved(website);
+                })//subscribe
+    }
     onResolved(website: IWebsite): void {
         if (website) {
             if (this.websiteForm) {
                 this.websiteForm.reset();  //resets validation values and empties values
             }
             this.website = website;
-            //store this as the selected website
-            this.store.dispatch(new websiteActions.SetCurrentWebsite(this.website));
-
         } else {
             this.website = new Website();
             this.popup = new Message('alert', 'Sorry, an error occurred while getting the website.', "", 0);
@@ -243,9 +228,6 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
     }
 
     ngOnDestroy(): void {
-        // this.sub.unsubscribe();
-        // this.subWebsiteName.unsubscribe();
-        // this.subUrl.unsubscribe();
         this.componentActive = false;
     }
 
