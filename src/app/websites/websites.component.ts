@@ -83,8 +83,13 @@ export class WebsitesComponent implements OnInit, OnDestroy {
     }
 
     goToSelectedWebsite(website): void {
-        this.store.dispatch(new websiteActions.SetCurrentWebsite(website));
-        this.router.navigate(['/websites', website.websiteID, 'detail']);
+        if (website) {
+            this.store.dispatch(new websiteActions.SetCurrentWebsite(website));
+            this.router.navigate(['/websites', website.websiteID, 'detail']);
+        } else {
+            this.store.dispatch(new websiteActions.InitializeCurrentWebsite);
+            this.router.navigate(['/websites', '0', 'detail']);
+        }
     }
 
     ngOnDestroy() {

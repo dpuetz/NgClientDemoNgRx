@@ -26,7 +26,7 @@
                               <a [routerLink]="" (click)="openWebsite()">Launch Website</a>
                             </li>
                             <li *ngIf="website.websiteID > 0">
-                              <a routerLink="/websites/0/detail">Add New Website</a>
+                                <a [routerLink]="" (click) = "newWebsite()">Add New Website</a>
                             </li>
                             <li *ngIf="website.websiteID > 0">
                               <a [routerLink]="['/websites', website.websiteID, 'purchase', 0]"

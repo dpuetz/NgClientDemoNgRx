@@ -58,10 +58,17 @@ export function reducer (state = initialState, action: WebsiteActions): WebsiteS
                 //need a whole new object to prevent that.
                 //else the store will get updated when you change a website
             }
-        case WebsiteActionTypes.ClearCurrentWebsite:
+        case WebsiteActionTypes.DeleteWebsiteSuccess:
             return {
                 ...state,
-                currentWebsite: null
+                websites: state.websites.filter(website => website.websiteID !== action.payload),
+                currentWebsite: null,
+                error: ''
+            }
+        case WebsiteActionTypes.DeleteWebsiteFail:
+            return {
+                ...state,
+                error: action.payload
             }
         case WebsiteActionTypes.InitializeCurrentWebsite:
             return {
@@ -71,7 +78,8 @@ export function reducer (state = initialState, action: WebsiteActions): WebsiteS
         case WebsiteActionTypes.LoadSuccess:
             return {
                 ...state,
-                websites: action.payload
+                websites: action.payload,
+                error: ''
             }
         case WebsiteActionTypes.LoadFail:
             return {

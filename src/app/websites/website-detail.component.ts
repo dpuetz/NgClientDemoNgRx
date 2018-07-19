@@ -50,7 +50,14 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
     }//constructor
 
     ngOnInit() {
+        this.createWebsiteForm();
+        this.watchForUrlChanges();
+        this.watchForNameChanges();
+        this.getCurrentWebsite();
+    }
 
+//////////////initializers
+    createWebsiteForm():void {
         this.websiteForm = this.fb.group({
             url:        ['', [Validators.pattern('https?://.+')]],
             websiteName:['', [Validators.required]],
@@ -61,7 +68,9 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
             preferred: true,
             isBill: false
         });  //websiteForm
+    }
 
+    watchForUrlChanges(): void {
         const urlControl = this.websiteForm.get('url');
         urlControl.valueChanges
                 .pipe(
@@ -71,7 +80,9 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
                 .subscribe(value =>
                         this.setMessage(urlControl, 'url')
         );
+    }
 
+    watchForNameChanges(): void {
         const websiteNameControl = this.websiteForm.get('websiteName');
         websiteNameControl.valueChanges
                 // .pipe(debounceTime(1000))
@@ -83,17 +94,7 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
                     this.websiteNameDisplay = value;
                     this.setMessage(websiteNameControl, 'websiteName');
                 }); //subscribe
-
-        this.getCurrentWebsite();
-        // this.route.data
-        //     .pipe(
-        //         takeWhile(() => this.componentActive)
-        //     )//pipe
-        //     .subscribe(  //https://angular.io/guide/router says that unsubscribing to activated route is unnecessary
-        //         data => this.onResolved(data['website'])
-        //     ); //subscribe
-    }//ngOnInit
-
+    }
 
    setMessage(c: AbstractControl, name: string): void {
         switch (name)   {
@@ -126,6 +127,7 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
                     this.onResolved(website);
                 })//subscribe
     }
+
     onResolved(website: IWebsite): void {
         if (website) {
             if (this.websiteForm) {
@@ -133,8 +135,13 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
             }
             this.website = website;
         } else {
-            this.website = new Website();
-            this.popup = new Message('alert', 'Sorry, an error occurred while getting the website.', "", 0);
+            //show success msg for 1 sec then route back to websites list
+            this.popup = new Message('timedAlert', 'Delete was successful!', "", 1000);
+            setTimeout (() => {
+                this.router.navigate(['/websites']);
+            }, 1000);
+            // this.website = new Website();
+            // this.popup = new Message('alert', 'Sorry, an error occurred while getting the website.', "", 0);
         }
 
         // Update the data on the form
@@ -149,10 +156,12 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
             isBill: this.website.isBill
         });
         this.websiteNameDisplay = this.website.websiteName;
-
-        // window.scrollTo(0, 0);
-
     } //onResolved
+
+    newWebsite(): void {
+        this.store.dispatch(new websiteActions.InitializeCurrentWebsite);
+        this.router.navigate(['/websites', '0', 'detail']);
+    }//goToSelectedWebsite
 
     /////////deleting
     deleteIt(): void{
@@ -160,24 +169,27 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
     }
 
     onComplete(event:any):void {
-        //if they confirm in the message-component dialog launched by this.deleteIt();
-        this.websiteService.deleteWebsite(this.website.websiteID)
-                    .subscribe(val =>
-                        {
-                            if (val)
-                            {
-                                //show success msg for 1 sec then route back to websites list
-                                this.popup = new Message('timedAlert', 'Delete was successful!', "", 1000);
-                                setTimeout (() => {
-                                    this.router.navigate(['/websites']);
-                                }, 1000);
-                            } else {
-                                this.deleteError();
-                            }
-                        },
-                        error => this.deleteError()
+        this.store.dispatch(new websiteActions.DeleteWebsite(this.website.websiteID));
 
-                    );//subscribe
+//DeleteWebsite
+        //if they confirm in the message-component dialog launched by this.deleteIt();
+        // this.websiteService.deleteWebsite(this.website.websiteID)
+        //             .subscribe(val =>
+        //                 {
+        //                     if (val)
+        //                     {
+        //                         //show success msg for 1 sec then route back to websites list
+        //                         this.popup = new Message('timedAlert', 'Delete was successful!', "", 1000);
+        //                         setTimeout (() => {
+        //                             this.router.navigate(['/websites']);
+        //                         }, 1000);
+        //                     } else {
+        //                         this.deleteError();
+        //                     }
+        //                 },
+        //                 error => this.deleteError()
+
+        //             );//subscribe
     }//onConfirmDelete
 
     deleteError(): void {

@@ -5,6 +5,9 @@ import { ISearch } from "../ISearch";
 export enum WebsiteActionTypes {
     SetSearchParams = '[Website] Get Search Params',
     SetCurrentWebsite = '[Website] Set Current Website',
+    DeleteWebsite = '[Website] Delete Website',
+    DeleteWebsiteSuccess = '[Website] Delete Website Success',
+    DeleteWebsiteFail = '[Website] Delete Website Fail',
     ClearCurrentWebsite = '[Website] Clear Current Website',
     InitializeCurrentWebsite = '[Website] Initialize Current Website',
     Load = '[Website] Load',
@@ -22,9 +25,19 @@ export class SetCurrentWebsite implements Action {
     constructor (public payload: IWebsite){}
 }
 
-export class ClearCurrentWebsite implements Action {
-    readonly type = WebsiteActionTypes.ClearCurrentWebsite
-    constructor (){}  //no payload
+export class DeleteWebsite implements Action {
+    readonly type = WebsiteActionTypes.DeleteWebsite
+    constructor (public payload: number){}
+}
+
+export class DeleteWebsiteSuccess implements Action {
+    readonly type = WebsiteActionTypes.DeleteWebsiteSuccess
+    constructor (public payload: number){}
+}
+
+export class DeleteWebsiteFail implements Action {
+    readonly type = WebsiteActionTypes.DeleteWebsiteFail
+    constructor (public payload: string){}
 }
 
 export class InitializeCurrentWebsite implements Action {
@@ -49,7 +62,9 @@ export class LoadFail implements Action {
 
 export type WebsiteActions = SetSearchParams
         | SetCurrentWebsite
-        | ClearCurrentWebsite
+        | DeleteWebsite
+        | DeleteWebsiteSuccess
+        | DeleteWebsiteFail
         | InitializeCurrentWebsite
         | Load
         | LoadSuccess

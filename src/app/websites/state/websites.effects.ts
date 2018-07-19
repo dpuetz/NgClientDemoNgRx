@@ -36,4 +36,20 @@ export class WebsiteEffects {
                     )//pipe
             )//mergeMap
         )//pipe
+
+ @Effect()
+    deleteWebsite$: Observable<Action> = this.actions$
+        .pipe(
+            ofType(websiteActions.WebsiteActionTypes.DeleteWebsite),
+            map((action: websiteActions.DeleteWebsite) => action.payload),
+            mergeMap((websiteID: number) =>
+                this.websiteService.deleteWebsite(websiteID)
+                    .pipe(
+                        map(
+                            () => (new websiteActions.DeleteWebsiteSuccess(websiteID))
+                         ),//map
+                        catchError(err => of(new websiteActions.DeleteWebsiteFail(err)))
+                    )//pipe
+            )//mergeMap
+        )//pipe
 }//class
