@@ -79,6 +79,7 @@
                 <tbody >
                      <!-- [routerLink] = "['/websites', website.websiteID, 'detail']" -->
                     <tr *ngFor="let website of websites"
+                        role="button"
                         (click) = "goToSelectedWebsite(website)">
                        <td><i *ngIf = "website.preferred" class="fa fa-check smallFont"></i></td>
                        <td><i *ngIf = "website.isBill" class="fa fa-check smallFont"></i></td>

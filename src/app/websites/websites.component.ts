@@ -73,6 +73,7 @@ export class WebsitesComponent implements OnInit, OnDestroy {
     doSearch(): void  {
         this.getWebsites();
     }
+
     doCheckSearch(): void   {
         //update display on form, and set searchword to ''
         this.searchForm.patchValue({
@@ -88,16 +89,15 @@ export class WebsitesComponent implements OnInit, OnDestroy {
         this.store.dispatch(new websiteActions.Load(searchParams));
     }//getWebsites
 
-
-
     goToSelectedWebsite(website): void {
         if (website) {
             this.store.dispatch(new websiteActions.SetCurrentWebsite(website));
-            this.router.navigate(['/websites', website.websiteID, 'detail']);
+            // this.router.navigate(['/websites', website.websiteID, 'detail']);
         } else {
             this.store.dispatch(new websiteActions.InitializeCurrentWebsite);
-            this.router.navigate(['/websites', '0', 'detail']);
+            // this.router.navigate(['/websites', '0', 'detail']);
         }
+        this.router.navigate(['/websites', 'detail']);
     }
 
     ngOnDestroy() {

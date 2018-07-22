@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router} from '@angular/router';
 import { WebsiteService } from './website.service';
 import { IWebsite, Website } from './IWebsite';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';  //NgForm,
@@ -32,7 +32,7 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
 
     private validationMessages: { [key: string]: { [key: string]: string } };
 
-    constructor(  private route: ActivatedRoute,
+    constructor(  //private route: ActivatedRoute,
                   private router: Router,
                   private websiteService: WebsiteService,
                   private fb: FormBuilder,
@@ -160,7 +160,8 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
 
     newWebsite(): void {
         this.store.dispatch(new websiteActions.InitializeCurrentWebsite);
-        this.router.navigate(['/websites', '0', 'detail']);
+        // this.router.navigate(['/websites', '0', 'detail']);
+        this.router.navigate(['/websites', 'detail']);
     }//goToSelectedWebsite
 
     /////////deleting
@@ -217,7 +218,8 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
 
                             // window.scrollTo(0, 0);
                             setTimeout (() => {
-                               this.router.navigate(['/websites/', webserviceWebsiteID, 'detail']);
+                                this.router.navigate(['/websites/', 'detail']);
+                            //    this.router.navigate(['/websites/', webserviceWebsiteID, 'detail']);
                             }, 1000);
                         }
 
