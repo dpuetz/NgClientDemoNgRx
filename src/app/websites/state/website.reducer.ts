@@ -42,7 +42,12 @@ export const getCurrentWebsite = createSelector (
     getWebsiteFeatureState,
     state => state.currentWebsite
 );
+export const getError = createSelector (
+    getWebsiteFeatureState,
+    state => state.error
+);
 
+//use optional parameters to set the state to the initial state
 export function reducer (state = initialState, action: WebsiteActions): WebsiteState {
     switch (action.type) {
         case WebsiteActionTypes.SetSearchParams:
@@ -81,6 +86,12 @@ export function reducer (state = initialState, action: WebsiteActions): WebsiteS
                 websites: action.payload,
                 error: ''
             }
+        case WebsiteActionTypes.ClearCurrentError:
+            return {
+                ...state,
+                error: ''
+            }
+
         case WebsiteActionTypes.LoadFail:
             return {
                 ...state,

@@ -12,7 +12,8 @@ export enum WebsiteActionTypes {
     InitializeCurrentWebsite = '[Website] Initialize Current Website',
     Load = '[Website] Load',
     LoadSuccess = '[Website] Load Success',
-    LoadFail = '[Website] Load Fail'
+    LoadFail = '[Website] Load Fail',
+    ClearCurrentError = '[Website Clear Error]'
 }
 
 export class SetSearchParams implements Action {
@@ -39,6 +40,10 @@ export class DeleteWebsiteFail implements Action {
     readonly type = WebsiteActionTypes.DeleteWebsiteFail
     constructor (public payload: string){}
 }
+export class ClearCurrentError implements Action {
+    readonly type = WebsiteActionTypes.ClearCurrentError
+    constructor (){}
+}
 
 export class InitializeCurrentWebsite implements Action {
     readonly type = WebsiteActionTypes.InitializeCurrentWebsite
@@ -60,7 +65,9 @@ export class LoadFail implements Action {
     constructor (public payload: string){}
 }
 
-export type WebsiteActions = SetSearchParams
+export type WebsiteActions =
+          ClearCurrentError
+        | SetSearchParams
         | SetCurrentWebsite
         | DeleteWebsite
         | DeleteWebsiteSuccess

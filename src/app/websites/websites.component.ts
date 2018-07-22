@@ -1,6 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Website } from './IWebsite'
-import { WebsiteService } from './website.service';
 import { ISearch } from './ISearch';
 import { IMessage, Message } from '../shared/imessage';
 import { FormGroup, FormBuilder } from '@angular/forms';
@@ -23,10 +22,9 @@ export class WebsitesComponent implements OnInit, OnDestroy {
     searchForm: FormGroup;
     componentActive = true;
 
-    constructor( private websiteService: WebsiteService,
-                 private fb: FormBuilder,
+    constructor( private fb: FormBuilder,
                  private store: Store<fromWebsites.State>,
-                 private router: Router,  ) { }
+                 private router: Router  ) { }
 
     ngOnInit() {
         this.store
@@ -34,18 +32,31 @@ export class WebsitesComponent implements OnInit, OnDestroy {
                     select(fromWebsites.getSearchParams),
                     takeWhile(() => this.componentActive)
                 )//pipe
-                .subscribe(searchParams => {
-                    this.search = searchParams
-                })//subscribe
+            .subscribe(searchParams => {
+                this.search = searchParams
+            })//subscribe
 
         this.store
             .pipe(
                     select(fromWebsites.getWebsites),
                     takeWhile(() => this.componentActive)
                 )//pipe
-                .subscribe(websites => {
-                    this.websites = websites
-                })//subscribe
+            .subscribe(websites => {
+                this.websites = websites
+            })//subscribe
+
+        this.store
+            .pipe(
+                    select(fromWebsites.getError),
+                    takeWhile(() => this.componentActive)
+                )//pipe
+            .subscribe(err => {
+                console.log('err', JSON.stringify(err));
+                if(err) {
+                    this.store.dispatch(new websiteActions.ClearCurrentError());
+                    this.popup = new Message('alert', 'Sorry, an error has occurred.', "", 0);
+                }
+            })//subscribe
 
         this.searchForm = this.fb.group({
             searchWord: this.search.searchWord,
@@ -63,7 +74,7 @@ export class WebsitesComponent implements OnInit, OnDestroy {
         this.getWebsites();
     }
     doCheckSearch(): void   {
-        //update display on form, set searchword to ''
+        //update display on form, and set searchword to ''
         this.searchForm.patchValue({
             searchWord: ''
         });
@@ -77,10 +88,7 @@ export class WebsitesComponent implements OnInit, OnDestroy {
         this.store.dispatch(new websiteActions.Load(searchParams));
     }//getWebsites
 
-    getError():void {
-        console.log("err");
-        this.popup = new Message('alert', 'Sorry, an error has occurred while getting the data.', "", 0);
-    }
+
 
     goToSelectedWebsite(website): void {
         if (website) {

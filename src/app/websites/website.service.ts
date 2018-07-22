@@ -7,7 +7,7 @@
 
 //angular for services
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { HttpClient, HttpHeaders, HttpResponse, HttpParams, HttpErrorResponse  } from '@angular/common/http';
 import { environment } from '../../environments/environment';
@@ -142,11 +142,12 @@ export class WebsiteService {
             this.log(`${operation} failed: ${error.message}`);
 
             // TODO: send the error to remote logging infrastructure
-            let str = JSON.stringify(error, null, 4);
-            this.log('error=' + str); // log to console instead
+            let errMsg = JSON.stringify(error, null, 4);
+            this.log('error=' + errMsg); // log to console instead
 
             // Let the app keep running by returning an empty result.
-            return of(result as T);
+            // return of(result as T);
+            return throwError(errMsg);
         }
     };  //handleError
 
