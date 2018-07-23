@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Router} from '@angular/router';
+import { Router, ActivatedRoute} from '@angular/router';
 import { WebsiteService } from './website.service';
 import { IWebsite, Website } from './IWebsite';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';  //NgForm,
@@ -18,6 +18,7 @@ import { Store, select } from '@ngrx/store';
 export class WebsiteDetailComponent implements OnDestroy, OnInit {
 
     website: IWebsite = new Website();
+    websiteId: number = 0;
     popup : IMessage;
     websiteForm: FormGroup;
     websiteNameMsg:string;
@@ -34,7 +35,8 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
 
     private validationMessages: { [key: string]: { [key: string]: string } };
 
-    constructor(  private router: Router,
+    constructor(  private route: ActivatedRoute,
+                  private router: Router,
                   private websiteService: WebsiteService,
                   private fb: FormBuilder,
                   private purchaseParams: PurchaseParameterService,
@@ -51,6 +53,7 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
     }//constructor
 
     ngOnInit() {
+        this.loadWebsite();
         this.createWebsiteForm();
         this.watchForUrlChanges();
         this.watchForNameChanges();
@@ -59,6 +62,17 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
     }
 
 //////////////initializers
+    loadWebsite(): void {
+        //get the id from the route
+        this.route.params.subscribe( params =>  this.websiteId = +params['id']);
+console.log('this.websiteId', this.websiteId);
+        //call http to load the website
+        if (this.websiteId) {
+            this.store.dispatch(new websiteActions.LoadCurrentWebsite(this.websiteId));
+        } else {
+            this.popup = new Message('alert', 'Sorry, an error has occurred while loading the website.', "", 0);
+        }
+    }
     createWebsiteForm():void {
         this.websiteForm = this.fb.group({
             url:        ['', [Validators.pattern('https?://.+')]],
@@ -141,19 +155,19 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
 
     /////////getting
     getCurrentWebsite() {
-        //select current website id
-        this.store
-            .pipe(
-                    select(fromWebsites.getCurrentWebsiteId),
-                    takeWhile(() => this.componentActive)
-                )//pipe
-                .subscribe(websiteId => {
-                    if (websiteId) {
-                        this.store.dispatch(new websiteActions.LoadCurrentWebsite(websiteId));
-                    } else {
-                        this.popup = new Message('alert', 'Sorry, an error occurred while loading the website.', "", 0);
-                    }
-                })//subscribe
+        // //select current website id
+        // this.store
+        //     .pipe(
+        //             select(fromWebsites.getCurrentWebsiteId),
+        //             takeWhile(() => this.componentActive)
+        //         )//pipe
+        //         .subscribe(websiteId => {
+        //             if (websiteId) {
+        //                 this.store.dispatch(new websiteActions.LoadCurrentWebsite(websiteId));
+        //             } else {
+        //                 this.popup = new Message('alert', 'Sorry, an error occurred while loading the website.', "", 0);
+        //             }
+        //         })//subscribe
 
         //get current website when it's ready
         this.store
@@ -191,7 +205,7 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
 
     newWebsite(): void {
         this.store.dispatch(new websiteActions.InitializeCurrentWebsite);
-        this.router.navigate(['/websites', 'detail']);
+        this.router.navigate(['/websites', '0', 'detail']);
     }
 
     /////////deleting

@@ -14,7 +14,7 @@ export interface State extends fromRoot.State {
 export interface WebsiteState {
     searchParams: ISearch,
     websites: IWebsite[],
-    currentWebsiteId: number,
+    // currentWebsiteId: number,
     currentWebsite: IWebsite,
     error: string
 }
@@ -23,7 +23,7 @@ export interface WebsiteState {
 const initialState: WebsiteState = {
     searchParams: new Search(),  //contains correct defaults
     websites: [],
-    currentWebsiteId: 0,
+    // currentWebsiteId: 0,
     currentWebsite: new Website(),
     error: ''
 }
@@ -40,10 +40,10 @@ export const getWebsites = createSelector (
     getWebsiteFeatureState,
     state => state.websites
 );
-export const getCurrentWebsiteId = createSelector (
-    getWebsiteFeatureState,
-    state => state.currentWebsiteId
-);
+// export const getCurrentWebsiteId = createSelector (
+//     getWebsiteFeatureState,
+//     state => state.currentWebsiteId
+// );
 
 export const getCurrentWebsite = createSelector (
     getWebsiteFeatureState,
@@ -63,20 +63,20 @@ export function reducer (state = initialState, action: WebsiteActions): WebsiteS
                 ...state,
                 searchParams: {...action.payload}
             }
-        case WebsiteActionTypes.SetCurrentWebsiteId:
-            return {
-                ...state,
-                currentWebsiteId: action.payload
-                //if payload is an object
-                //if you don't use the ..., it will pass by value.
-                //need a whole new object to prevent that.
-                //else the store will get updated when you change a website
-            }
+        // case WebsiteActionTypes.SetCurrentWebsiteId:
+        //     return {
+        //         ...state,
+        //         currentWebsiteId: action.payload
+        //         //if payload is an object
+        //         //if you don't use the ..., it will pass by value.
+        //         //need a whole new object to prevent that.
+        //         //else the store will get updated when you change a website
+        //     }
         case WebsiteActionTypes.DeleteWebsiteSuccess:
             return {
                 ...state,
-                websites: state.websites.filter(website => website.websiteID !== action.payload),
-                currentWebsiteId: 0,
+                currentWebsite: null, //new Website(),  //spread?
+                // websites: state.websites.filter(website => website.websiteID !== action.payload),
                 error: ''
             }
         case WebsiteActionTypes.DeleteWebsiteFail:
@@ -87,7 +87,7 @@ export function reducer (state = initialState, action: WebsiteActions): WebsiteS
         case WebsiteActionTypes.InitializeCurrentWebsite:
             return {
                 ...state,
-                currentWebsiteId: 0
+                currentWebsite: new Website(),  //spread?
             }
         case WebsiteActionTypes.LoadSuccess:
             return {
@@ -114,7 +114,6 @@ export function reducer (state = initialState, action: WebsiteActions): WebsiteS
             return {
                 ...state,
                 currentWebsite: null,
-                currentWebsiteId: 0,
                 error: action.payload
             }
         case WebsiteActionTypes.ClearCurrentError:

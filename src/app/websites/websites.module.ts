@@ -53,8 +53,8 @@ const routes: Routes = [
             component: WebsitesComponent
         },
         {
-            // path: ':id/detail',
-            path: 'detail',
+            path: ':id/detail',
+            // path: 'detail',
             component: WebsiteDetailComponent,
             // resolve: {website: WebsiteDetailResolver},  //get data before routing to page
             runGuardsAndResolvers:'always'   //allow re-load of the component to refresh it.

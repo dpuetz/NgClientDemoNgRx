@@ -27,14 +27,14 @@ export class WebsiteEffects {
     //7. if error, call LoadFail action.
     loadWebsites$: Observable<Action> = this.actions$
         .pipe(
-            tap(val=>console.log('loadWebsites 1')),
+            // tap(val=>console.log('loadWebsites 1')),
             ofType(websiteActions.WebsiteActionTypes.Load),
-            tap(val=>console.log('loadWebsites 2')),
+            // tap(val=>console.log('loadWebsites 2')),
             map((action: websiteActions.Load) => action.payload),
             mergeMap((searchParams: ISearch) =>
                 this.websiteService.getWebsites(searchParams)
                     .pipe(
-                        tap(val =>console.log('effects ',  val.length)),
+                        // tap(val =>console.log('effects ',  val.length)),
                         map(
                             websites => (new websiteActions.LoadSuccess(websites))
                          ),//map
