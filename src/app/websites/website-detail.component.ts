@@ -9,6 +9,7 @@ import { PurchaseParameterService } from './purchase-parameter.service';
 import * as fromWebsites from './state/website.reducer';
 import * as websiteActions from './state/website.action';
 import { Store, select } from '@ngrx/store';
+// import { Observable } from 'rxjs';
 
 @Component({
     templateUrl: './website-detail.component.html'
@@ -22,6 +23,7 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
     websiteNameMsg:string;
     urlMsg: string;
     componentActive = true;
+    // error: Observable<string>;
 
     get websiteNameDisplay (): string {
         return this.purchaseParams.websiteName;
@@ -32,8 +34,7 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
 
     private validationMessages: { [key: string]: { [key: string]: string } };
 
-    constructor(  //private route: ActivatedRoute,
-                  private router: Router,
+    constructor(  private router: Router,
                   private websiteService: WebsiteService,
                   private fb: FormBuilder,
                   private purchaseParams: PurchaseParameterService,
@@ -53,6 +54,7 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
         this.createWebsiteForm();
         this.watchForUrlChanges();
         this.watchForNameChanges();
+        // this.watchForErrors();
         this.getCurrentWebsite();
     }
 
@@ -96,6 +98,27 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
                 }); //subscribe
     }
 
+    // watchForErrors () {
+    //     this.error.pipe(
+    //         takeWhile(() => this.componentActive)
+    //     )
+    //     .subscribe(err => {
+    //         console.log('err', JSON.stringify(err));
+    //     });
+    //     // this.store
+    //     //     .pipe(
+    //     //             select(fromWebsites.getError),
+    //     //             takeWhile(() => this.componentActive)
+    //     //         )//pipe
+    //     //     .subscribe(err => {
+    //     //         console.log('err', JSON.stringify(err));
+    //     //         if(err) {
+    //     //             this.store.dispatch(new websiteActions.ClearCurrentError());
+    //     //             this.popup = new Message('alert', 'Sorry.' + this.currentError, "", 0);
+    //     //         }
+    //     //     })//subscribe
+    // }//watchForErrors
+
    setMessage(c: AbstractControl, name: string): void {
         switch (name)   {
             case 'websiteName':
@@ -118,32 +141,40 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
 
     /////////getting
     getCurrentWebsite() {
+        //select current website id
+        this.store
+            .pipe(
+                    select(fromWebsites.getCurrentWebsiteId),
+                    takeWhile(() => this.componentActive)
+                )//pipe
+                .subscribe(websiteId => {
+                    if (websiteId) {
+                        this.store.dispatch(new websiteActions.LoadCurrentWebsite(websiteId));
+                    } else {
+                        this.popup = new Message('alert', 'Sorry, an error occurred while loading the website.', "", 0);
+                    }
+                })//subscribe
+
+        //get current website when it's ready
         this.store
             .pipe(
                     select(fromWebsites.getCurrentWebsite),
                     takeWhile(() => this.componentActive)
                 )//pipe
                 .subscribe(website => {
-                    this.onResolved(website);
+                    if (website) {
+                        this.onLoadWebsiteForm(website);
+                    } else {
+                        this.popup = new Message('alert', 'Sorry, an error occurred while loading the website.', "", 0);
+                    }
                 })//subscribe
-    }
+    }//getCurrentWebsite
 
-    onResolved(website: IWebsite): void {
-        if (website) {
-            if (this.websiteForm) {
-                this.websiteForm.reset();  //resets validation values and empties values
-            }
-            this.website = website;
-        } else {
-            //show success msg for 1 sec then route back to websites list
-            this.popup = new Message('timedAlert', 'Delete was successful!', "", 1000);
-            setTimeout (() => {
-                this.router.navigate(['/websites']);
-            }, 1000);
-            // this.website = new Website();
-            // this.popup = new Message('alert', 'Sorry, an error occurred while getting the website.', "", 0);
+    onLoadWebsiteForm(website: IWebsite): void {
+        if (this.websiteForm) {
+            this.websiteForm.reset();  //resets validation values and empties values
         }
-
+        this.website = website;
         // Update the data on the form
         this.websiteForm.patchValue({  //have to use patchValue not setValue because ? fb.array needs patchValue
             url: this.website.url,
@@ -156,13 +187,12 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
             isBill: this.website.isBill
         });
         this.websiteNameDisplay = this.website.websiteName;
-    } //onResolved
+    } //onLoadWebsiteForm
 
     newWebsite(): void {
         this.store.dispatch(new websiteActions.InitializeCurrentWebsite);
-        // this.router.navigate(['/websites', '0', 'detail']);
         this.router.navigate(['/websites', 'detail']);
-    }//goToSelectedWebsite
+    }
 
     /////////deleting
     deleteIt(): void{

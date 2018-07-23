@@ -4,26 +4,29 @@ import { ISearch } from "../ISearch";
 
 export enum WebsiteActionTypes {
     SetSearchParams = '[Website] Get Search Params',
-    SetCurrentWebsite = '[Website] Set Current Website',
+    SetCurrentWebsiteId = '[Website] Set Current Website ID',
     DeleteWebsite = '[Website] Delete Website',
     DeleteWebsiteSuccess = '[Website] Delete Website Success',
     DeleteWebsiteFail = '[Website] Delete Website Fail',
-    ClearCurrentWebsite = '[Website] Clear Current Website',
     InitializeCurrentWebsite = '[Website] Initialize Current Website',
     Load = '[Website] Load',
     LoadSuccess = '[Website] Load Success',
     LoadFail = '[Website] Load Fail',
-    ClearCurrentError = '[Website Clear Error]'
+    ClearCurrentError = '[Website Clear Error]',
+	LoadCurrentWebsite = '[Website Load Current Website]',
+	LoadCurrentWebsiteSuccess = '[Website Load Current Website Success]',
+	LoadCurrentWebsiteFail = '[Website Load Current Website Fail]'
 }
+
 
 export class SetSearchParams implements Action {
     readonly type = WebsiteActionTypes.SetSearchParams
     constructor (public payload: ISearch){}
 }
 
-export class SetCurrentWebsite implements Action {
-    readonly type = WebsiteActionTypes.SetCurrentWebsite
-    constructor (public payload: IWebsite){}
+export class SetCurrentWebsiteId implements Action {
+    readonly type = WebsiteActionTypes.SetCurrentWebsiteId
+    constructor (public payload: number){}
 }
 
 export class DeleteWebsite implements Action {
@@ -65,14 +68,32 @@ export class LoadFail implements Action {
     constructor (public payload: string){}
 }
 
+export class LoadCurrentWebsite implements Action {
+    readonly type = WebsiteActionTypes.LoadCurrentWebsite
+    constructor (public payload: number){}
+}
+
+export class LoadCurrentWebsiteSuccess implements Action {
+    readonly type = WebsiteActionTypes.LoadCurrentWebsiteSuccess
+    constructor (public payload: IWebsite){}
+}
+
+export class LoadCurrentWebsiteFail implements Action {
+    readonly type = WebsiteActionTypes.LoadCurrentWebsiteFail
+    constructor (public payload: string){}
+}
+
 export type WebsiteActions =
-          ClearCurrentError
-        | SetSearchParams
-        | SetCurrentWebsite
+          SetSearchParams
+        | SetCurrentWebsiteId
         | DeleteWebsite
         | DeleteWebsiteSuccess
         | DeleteWebsiteFail
         | InitializeCurrentWebsite
         | Load
         | LoadSuccess
-        | LoadFail;
+        | LoadFail
+        | ClearCurrentError
+        | LoadCurrentWebsite
+        | LoadCurrentWebsiteSuccess
+        | LoadCurrentWebsiteFail;

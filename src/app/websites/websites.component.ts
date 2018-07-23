@@ -91,11 +91,9 @@ export class WebsitesComponent implements OnInit, OnDestroy {
 
     goToSelectedWebsite(website): void {
         if (website) {
-            this.store.dispatch(new websiteActions.SetCurrentWebsite(website));
-            // this.router.navigate(['/websites', website.websiteID, 'detail']);
+            this.store.dispatch(new websiteActions.SetCurrentWebsiteId(website.websiteID));
         } else {
             this.store.dispatch(new websiteActions.InitializeCurrentWebsite);
-            // this.router.navigate(['/websites', '0', 'detail']);
         }
         this.router.navigate(['/websites', 'detail']);
     }
