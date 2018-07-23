@@ -15,7 +15,10 @@ export enum WebsiteActionTypes {
     ClearCurrentError = '[Website Clear Error]',
 	LoadCurrentWebsite = '[Website Load Current Website]',
 	LoadCurrentWebsiteSuccess = '[Website Load Current Website Success]',
-	LoadCurrentWebsiteFail = '[Website Load Current Website Fail]'
+	LoadCurrentWebsiteFail = '[Website Load Current Website Fail]',
+    UpdateWebsite = '[Website] Update Website',
+    UpdateWebsiteSuccess = '[Website] Update Website Success',
+    UpdateWebsiteFail = '[Website] Update Website Fail'
 }
 
 
@@ -68,6 +71,23 @@ export class LoadFail implements Action {
     constructor (public payload: string){}
 }
 
+export class UpdateWebsite implements Action {
+    readonly type = WebsiteActionTypes.UpdateWebsite
+    constructor (public payload: IWebsite){}
+}
+
+export class UpdateWebsiteSuccess implements Action {
+    readonly type = WebsiteActionTypes.UpdateWebsiteSuccess
+    // constructor (public payload: IWebsite){} //??
+    constructor (public payload: IWebsite){}  //??
+}
+
+export class UpdateWebsiteFail implements Action {
+    readonly type = WebsiteActionTypes.UpdateWebsiteFail
+    constructor (public payload: string){}
+}
+
+
 export class LoadCurrentWebsite implements Action {
     readonly type = WebsiteActionTypes.LoadCurrentWebsite
     constructor (public payload: number){}
@@ -96,4 +116,10 @@ export type WebsiteActions =
         | ClearCurrentError
         | LoadCurrentWebsite
         | LoadCurrentWebsiteSuccess
-        | LoadCurrentWebsiteFail;
+        | LoadCurrentWebsiteFail
+        | UpdateWebsite
+        | UpdateWebsiteSuccess
+        | UpdateWebsiteFail
+
+
+

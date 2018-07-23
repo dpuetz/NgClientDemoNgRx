@@ -118,6 +118,20 @@ export function reducer (state = initialState, action: WebsiteActions): WebsiteS
                 ...state,
                 error: ''
             }
+ 	case WebsiteActionTypes.UpdateWebsiteSuccess:
+		//get the current website, add this id to it.
+ 		return {
+ 			...state,
+ 			currentWebsite:  action.payload,
+ 			error: ''
+ 		}
+ 	case WebsiteActionTypes.UpdateWebsiteFail:
+console.log('UpdateWebsiteFail', action.payload);
+ 		return {
+ 			...state,
+ 			currentWebsite: null,
+ 			error: action.payload
+ 		}
         default:
             return state;
     }//switch

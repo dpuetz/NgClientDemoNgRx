@@ -30,3 +30,8 @@ export class Website implements IWebsite {
   question: string = '';
   answer: string = '';
 }
+
+export function setWebsiteId (website:IWebsite, websiteId: number): IWebsite {
+    website.websiteID = websiteId;
+    return website;
+}

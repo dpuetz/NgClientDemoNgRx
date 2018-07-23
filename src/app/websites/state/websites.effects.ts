@@ -6,7 +6,7 @@ import { mergeMap, map, catchError, withLatestFrom, tap } from "rxjs/operators";
 import { Observable, of } from "rxjs";
 import { Action, Store } from "@ngrx/store";
 import { ISearch } from "../ISearch";
-import { IWebsite } from "../IWebsite";
+import { IWebsite, setWebsiteId } from "../IWebsite";
 import * as fromWebsites from '../state/website.reducer';
 
 @Injectable()
@@ -34,7 +34,7 @@ export class WebsiteEffects {
             mergeMap((searchParams: ISearch) =>
                 this.websiteService.getWebsites(searchParams)
                     .pipe(
-                        tap(val =>console.log('effects ',  val.length)),
+                        // tap(val =>console.log('effects ',  val.length)),
                         map(
                             websites => (new websiteActions.LoadSuccess(websites))
                          ),//map
@@ -61,7 +61,6 @@ export class WebsiteEffects {
 
     @Effect()
     loadCurrentWebsite$: Observable<Action> = this.actions$
-
         .pipe(
             ofType(websiteActions.WebsiteActionTypes.LoadCurrentWebsite),
             map((action: websiteActions.LoadCurrentWebsite) => action.payload),
@@ -74,6 +73,21 @@ export class WebsiteEffects {
         )//pipe
         )//mergemap
     ); //pipe
+
+    @Effect()
+    updateWebsite$: Observable<Action> = this.actions$
+        .pipe(
+            ofType(websiteActions.WebsiteActionTypes.UpdateWebsite),
+            map((action: websiteActions.UpdateWebsite) => action.payload),
+            mergeMap((website: IWebsite) =>
+                this.websiteService.saveWebsite(website).pipe(
+                     map(websiteId => (new websiteActions.UpdateWebsiteSuccess(setWebsiteId(website, websiteId)))),
+                    catchError(err => of(new websiteActions.UpdateWebsiteFail(err))
+                )//pipe
+        )//pipe
+        )//mergemap
+    ); //pipe
+
 
     //works, but don't need it.
     // @Effect()
