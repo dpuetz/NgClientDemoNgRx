@@ -14,7 +14,6 @@ export interface State extends fromRoot.State {
 export interface WebsiteState {
     searchParams: ISearch,
     websites: IWebsite[],
-    // currentWebsiteId: number,
     currentWebsite: IWebsite,
     error: string
 }
@@ -23,7 +22,6 @@ export interface WebsiteState {
 const initialState: WebsiteState = {
     searchParams: new Search(),  //contains correct defaults
     websites: [],
-    // currentWebsiteId: 0,
     currentWebsite: null,
     error: ''
 }
@@ -100,7 +98,6 @@ export function reducer (state = initialState, action: WebsiteActions): WebsiteS
             }
 
         case WebsiteActionTypes.LoadCurrentWebsiteSuccess:
-// console.log('LoadCurrentWebsiteSuccess action.payload', action.payload);
             return {
                 ...state,
                 currentWebsite:  action.payload,
@@ -119,14 +116,12 @@ export function reducer (state = initialState, action: WebsiteActions): WebsiteS
                 error: ''
             }
  	case WebsiteActionTypes.UpdateWebsiteSuccess:
-		//get the current website, add this id to it.
  		return {
  			...state,
  			currentWebsite:  action.payload,
  			error: ''
  		}
  	case WebsiteActionTypes.UpdateWebsiteFail:
-console.log('UpdateWebsiteFail', action.payload);
  		return {
  			...state,
  			currentWebsite: null,

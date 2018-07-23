@@ -27,6 +27,7 @@ export class PurchaseComponent implements OnInit, OnDestroy {
     navigationSubscription: Subscription;
     subProductName: Subscription;
     a2eOptions: any = {format: 'M/D/YYYY'};
+    componentActive = true;
     private validationMessages: { [key: string]: { [key: string]: string } };
 
     constructor(
@@ -37,12 +38,14 @@ export class PurchaseComponent implements OnInit, OnDestroy {
         // private purchaseParams: PurchaseParameterService,
         private store: Store<fromWebsites.State>
     ) {
-            this.navigationSubscription = this.router.events.subscribe((e: any) => {
-                // If it is a NavigationEnd event, then re-initalise the component
-                if (e instanceof NavigationEnd) {
-                    this.initializePurchaseDetail();
-                }
-            });
+//TODO remove navigationSubscription
+//TODO add way to remove all subscriptssions
+            // this.navigationSubscription = this.router.events.subscribe((e: any) => {
+            //     // If it is a NavigationEnd event, then re-initalise the component
+            //     if (e instanceof NavigationEnd) {
+            //         this.initializePurchaseDetail();
+            //     }
+            // });
 
             // Define all of the validation messages for the form.
             this.validationMessages = {
@@ -53,40 +56,12 @@ export class PurchaseComponent implements OnInit, OnDestroy {
     }//constructor
 
     ngOnInit():void {
-        this.purchaseForm = this.fb.group({
-            purchaseID: 0,
-            productName: ['', [Validators.required]],
-            purchasedOn: '',
-            arrivedOn:  '',
-            totalAmount:  0,
-            shippingAmount: 0,
-            notes:      '',
-        });  //purchaseForm
-
-        const productNameControl = this.purchaseForm.get('productName');
-        this.subProductName = productNameControl.valueChanges
-                .pipe(debounceTime(100))
-                .subscribe(value => {
-                            this.setMessage(productNameControl, 'productName');
-                        }
-        );
-
+        this.createPurchaseForm();
+        this.watchProductName();
+        this.initializePurchaseDetail();
     }//ngOnInit
 
-   setMessage(c: AbstractControl, name: string): void {
-        switch (name)   {
-            case 'productName':
-                this.productNameMsg = '';
-                if ((c.touched || c.dirty) && c.errors) {
-                    this.productNameMsg = Object.keys(c.errors).map(key =>
-                                this.validationMessages.productName[key]).join(' ');
-                }
-                break;
-        } //switch
-
-    } //setMessage
-
-    initializePurchaseDetail(){    //re-set values
+    initializePurchaseDetail():void {    //re-set values and get the purchase
         this.route.paramMap.subscribe(params => {
 
             if (this.purchaseForm) {
@@ -190,7 +165,8 @@ export class PurchaseComponent implements OnInit, OnDestroy {
                     this.popup = new Message('timedAlert', 'Save was successful!', "", 1000);
 
                     setTimeout (() => {
-                        this.router.navigate(['/websites/', this.purchase.websiteID, 'purchase', this.purchase.purchaseID]);
+                         this.router.navigate(['/websites/', 'purchase', this.purchase.purchaseID]);
+                        // this.router.navigate(['/websites/', this.purchase.websiteID, 'purchase', this.purchase.purchaseID]);
                     }, 1000);
 
                 },
@@ -202,13 +178,45 @@ export class PurchaseComponent implements OnInit, OnDestroy {
     }  //saveIt
 
      ngOnDestroy() {
-            // !important - avoid memory leaks caused by navigationSubscription
-            if (this.navigationSubscription) {
-                this.navigationSubscription.unsubscribe();
-            }
-            if (this.subProductName) {
-                this.subProductName.unsubscribe();
-            }
+         this.componentActive = false;
+            // // !important - avoid memory leaks caused by navigationSubscription
+            // if (this.navigationSubscription) {
+            //     this.navigationSubscription.unsubscribe();
+            // }
+            // if (this.subProductName) {
+            //     this.subProductName.unsubscribe();
+            // }
      }
 
+    setMessage(c: AbstractControl, name: string): void {
+        switch (name)   {
+            case 'productName':
+                this.productNameMsg = '';
+                if ((c.touched || c.dirty) && c.errors) {
+                    this.productNameMsg = Object.keys(c.errors).map(key =>
+                                this.validationMessages.productName[key]).join(' ');
+                }
+                break;
+        } //switch
+    } //setMessage
+    createPurchaseForm(): void {
+        this.purchaseForm = this.fb.group({
+            purchaseID: 0,
+            productName: ['', [Validators.required]],
+            purchasedOn: '',
+            arrivedOn:  '',
+            totalAmount:  0,
+            shippingAmount: 0,
+            notes:      '',
+        });  //purchaseForm
+    } //createPurchaseForm
+    watchProductName(): void {
+        const productNameControl = this.purchaseForm.get('productName');
+        this.subProductName = productNameControl.valueChanges
+                .pipe(debounceTime(100))
+                .subscribe(value => {
+                            this.setMessage(productNameControl, 'productName');
+                        }
+        );
+    } //watchProductName
 } //class

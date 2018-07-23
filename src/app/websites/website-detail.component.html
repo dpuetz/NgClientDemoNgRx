@@ -19,7 +19,7 @@
 
                             <li [ngClass]="(website.websiteID > 0)?'':'navbarCollapseNone'">
                               <a [routerLink]="['/websites']">
-                                <i class="fa fa-angle-double-left "></i>
+                                <i class="fa fa-angle-double-left"></i>
                                 Back</a>
                             </li>
                             <li *ngIf="website.websiteID > 0">
@@ -28,9 +28,10 @@
                             <li *ngIf="website.websiteID > 0">
                                 <a [routerLink]="" (click) = "newWebsite()">Add New Website</a>
                             </li>
+                            <!-- <a [routerLink]="['/websites', website.websiteID, 'purchase', 0]"
+                            [queryParams]="{ websiteName: website.websiteName}" -->
                             <li *ngIf="website.websiteID > 0">
-                              <a [routerLink]="['/websites', website.websiteID, 'purchase', 0]"
-                              [queryParams]="{ websiteName: website.websiteName}">Add New Purchase</a>
+                              <a [routerLink]="['/websites', 'purchase', 0]">Add New Purchase</a>
                             </li>
                           </ul>
             </div>
@@ -155,9 +156,11 @@
                     <th>Received</th>
                   </tr>
                 </thead>
+   <!-- [routerLink]="['/websites', website.websiteID, 'purchase', purchase.purchaseID]" -->
                 <tbody>
                     <tr *ngFor="let purchase of website.lstPurchases"
-                        [routerLink]="['/websites', website.websiteID, 'purchase', purchase.purchaseID]"
+                        role="button"
+                        [routerLink]="['/websites', 'purchase', purchase.purchaseID]"
                         [queryParams] = "{websiteName: website.websiteName}">
                       <td>{{purchase.productName}}</td>
                       <td>{{purchase.purchasedOn}}</td>

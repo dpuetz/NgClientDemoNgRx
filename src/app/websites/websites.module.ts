@@ -60,7 +60,8 @@ const routes: Routes = [
             runGuardsAndResolvers:'always'   //allow re-load of the component to refresh it.
         },
         {
-            path: ':websiteId/purchase/:purchaseId',
+            // path: ':websiteId/purchase/:purchaseId',
+            path: 'purchase/:purchaseId',
             component: PurchaseComponent,
             resolve: {purchase: PurchaseResolver},
             // children: [
