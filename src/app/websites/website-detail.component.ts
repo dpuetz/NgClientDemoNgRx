@@ -18,12 +18,12 @@ import { Store, select } from '@ngrx/store';
 export class WebsiteDetailComponent implements OnDestroy, OnInit {
 
     website: IWebsite = new Website();
-    websiteId: number = 0;
     popup : IMessage;
     websiteForm: FormGroup;
     websiteNameMsg:string;
     urlMsg: string;
     componentActive = true;
+    websiteDeleted = false;
     // error: Observable<string>;
 
     get websiteNameDisplay (): string {
@@ -53,26 +53,31 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
     }//constructor
 
     ngOnInit() {
-        this.loadWebsite();
         this.createWebsiteForm();
+        this.addWebsiteToStore();
+        this.getWebsiteFromStore();
         this.watchForUrlChanges();
         this.watchForNameChanges();
         // this.watchForErrors();
-        this.getCurrentWebsite();
+
     }
 
-//////////////initializers
-    loadWebsite(): void {
+    addWebsiteToStore(): void {
         //get the id from the route
-        this.route.params.subscribe( params =>  this.websiteId = +params['id']);
-console.log('this.websiteId', this.websiteId);
-        //call http to load the website
-        if (this.websiteId) {
-            this.store.dispatch(new websiteActions.LoadCurrentWebsite(this.websiteId));
+        let websiteId = 0;
+        this.route.params.subscribe( params =>  websiteId = +params['id']);
+
+        if (websiteId === 0) {
+            //store an initialized website
+            this.store.dispatch(new websiteActions.InitializeCurrentWebsite());
+        } else if (websiteId > 0) {
+            //call http to store new website
+            this.store.dispatch(new websiteActions.LoadCurrentWebsite(websiteId));
         } else {
             this.popup = new Message('alert', 'Sorry, an error has occurred while loading the website.', "", 0);
         }
-    }
+    }//addWebsiteToStore
+
     createWebsiteForm():void {
         this.websiteForm = this.fb.group({
             url:        ['', [Validators.pattern('https?://.+')]],
@@ -153,22 +158,7 @@ console.log('this.websiteId', this.websiteId);
 
     } //setMessage
 
-    /////////getting
-    getCurrentWebsite() {
-        // //select current website id
-        // this.store
-        //     .pipe(
-        //             select(fromWebsites.getCurrentWebsiteId),
-        //             takeWhile(() => this.componentActive)
-        //         )//pipe
-        //         .subscribe(websiteId => {
-        //             if (websiteId) {
-        //                 this.store.dispatch(new websiteActions.LoadCurrentWebsite(websiteId));
-        //             } else {
-        //                 this.popup = new Message('alert', 'Sorry, an error occurred while loading the website.', "", 0);
-        //             }
-        //         })//subscribe
-
+    getWebsiteFromStore() {
         //get current website when it's ready
         this.store
             .pipe(
@@ -176,31 +166,43 @@ console.log('this.websiteId', this.websiteId);
                     takeWhile(() => this.componentActive)
                 )//pipe
                 .subscribe(website => {
-                    if (website) {
+                    if (website ) {
                         this.onLoadWebsiteForm(website);
                     } else {
-                        this.popup = new Message('alert', 'Sorry, an error occurred while loading the website.', "", 0);
+                        //we may have deleted it.
+                        if (this.websiteDeleted) {
+                            this.websiteDeleted = false;
+                            //show success msg for 1 sec then route back to websites list
+                            this.popup = new Message('timedAlert', 'Delete was successful!', "", 1000);
+                            setTimeout (() => {
+                                this.router.navigate(['/websites']);
+                            }, 1000);
+                        }
+                        //else we didn't delete it, but no website is there to load yet.
                     }
                 })//subscribe
-    }//getCurrentWebsite
+    }//getWebsiteFromStore
 
     onLoadWebsiteForm(website: IWebsite): void {
-        if (this.websiteForm) {
+        if (website && this.websiteForm) {
+
+            this.website = website;
             this.websiteForm.reset();  //resets validation values and empties values
+
+            // Update the data on the form
+            this.websiteForm.patchValue({  //have to use patchValue not setValue because ? fb.array needs patchValue
+                url: this.website.url,
+                websiteName: this.website.websiteName,
+                username: this.website.username,
+                email: this.website.email,
+                password: this.website.password,
+                notes: this.website.notes,
+                preferred: this.website.preferred,
+                isBill: this.website.isBill
+            });
+            this.websiteNameDisplay = this.website.websiteName;
+            window.scrollTo(0, 0);
         }
-        this.website = website;
-        // Update the data on the form
-        this.websiteForm.patchValue({  //have to use patchValue not setValue because ? fb.array needs patchValue
-            url: this.website.url,
-            websiteName: this.website.websiteName,
-            username: this.website.username,
-            email: this.website.email,
-            password: this.website.password,
-            notes: this.website.notes,
-            preferred: this.website.preferred,
-            isBill: this.website.isBill
-        });
-        this.websiteNameDisplay = this.website.websiteName;
     } //onLoadWebsiteForm
 
     newWebsite(): void {
@@ -212,40 +214,23 @@ console.log('this.websiteId', this.websiteId);
     deleteIt(): void{
         this.popup = new Message('confirm', 'Are sure you want to delete this website and all it\'s purchases ?', "onComplete", 0);
     }
-
     onComplete(event:any):void {
+        //they have just confirmed the delete
+        this.websiteDeleted = true;
         this.store.dispatch(new websiteActions.DeleteWebsite(this.website.websiteID));
+    }//onComplete
 
-//DeleteWebsite
-        //if they confirm in the message-component dialog launched by this.deleteIt();
-        // this.websiteService.deleteWebsite(this.website.websiteID)
-        //             .subscribe(val =>
-        //                 {
-        //                     if (val)
-        //                     {
-        //                         //show success msg for 1 sec then route back to websites list
-        //                         this.popup = new Message('timedAlert', 'Delete was successful!', "", 1000);
-        //                         setTimeout (() => {
-        //                             this.router.navigate(['/websites']);
-        //                         }, 1000);
-        //                     } else {
-        //                         this.deleteError();
-        //                     }
-        //                 },
-        //                 error => this.deleteError()
-
-        //             );//subscribe
-    }//onConfirmDelete
-
-    deleteError(): void {
-        this.popup = new Message('alert', 'Sorry, an error occurred while deleting the website.', "", 0);
-    }
+    //todo
+    // deleteError(): void {
+    //     this.popup = new Message('alert', 'Sorry, an error occurred while deleting the website.', "", 0);
+    // }
 
     /////////saving
     saveIt(): void{
         // this.website: original data bound to template
         // this.websiteForm.value: new form data on template now
-        let w = Object.assign({}, this.website, this.websiteForm.value);
+        // let w = Object.assign({}, this.website, this.websiteForm.value);
+        let w = {...this.website, ...this.websiteForm.value};
         console.log(w);  //w: object with new form data
 
         this.websiteService.saveWebsite(w)
@@ -260,10 +245,8 @@ console.log('this.websiteId', this.websiteId);
                             //Delay the re-route for a bit so user can see the saved message first.
                             this.popup = new Message('timedAlert', 'Save was successful!', "", 1000);
 
-                            // window.scrollTo(0, 0);
                             setTimeout (() => {
-                                this.router.navigate(['/websites/', 'detail']);
-                            //    this.router.navigate(['/websites/', webserviceWebsiteID, 'detail']);
+                               this.router.navigate(['/websites/', webserviceWebsiteID, 'detail']);
                             }, 1000);
                         }
 
@@ -292,3 +275,86 @@ console.log('this.websiteId', this.websiteId);
   }//class
 
 
+// --------------------
+// figure out how to load the websites
+// --------------------
+// *****
+// In the reducer file:
+// *****
+// State property:
+// 	websites: IWebsite[]
+
+// One selector:
+// 	export const getWebsites = createSelector (
+// 		getWebsiteFeatureState,
+// 		state => state.websites
+// 	);
+
+// 2 switch statements
+// 	case WebsiteActionTypes.LoadSuccess:
+// 		return {
+// 			...state,
+// 			websites:  {...action.payload},
+// 			error: ''
+// 		}
+// 	case WebsiteActionTypes.LoadFail:
+// 		return {
+// 			...state,
+// 			websites: [],
+// 			error: action.payload
+// 		}
+
+// *****
+// In the actions file:
+// *****
+// 3 actions
+//     Load = '[Website] Load',
+//     LoadSuccess = '[Website] Load Success',
+//     LoadFail = '[Website] Load Fail',
+
+// 	export class Load implements Action {
+// 		readonly type = WebsiteActionTypes.Load
+// 		constructor (public payload: ISearch){}
+// 	}
+// 	export class LoadSuccess implements Action {
+// 		readonly type = WebsiteActionTypes.LoadSuccess
+// 		constructor (public payload: IWebsite[]){}
+// 	}
+// 	export class LoadFail implements Action {
+// 		readonly type = WebsiteActionTypes.LoadFail
+// 		constructor (public payload: string){}
+// 	}
+
+// *****
+// In the effects file:
+// *****
+//     loadWebsites$: Observable<Action> = this.actions$
+//         .pipe(
+//             ofType(websiteActions.WebsiteActionTypes.Load),
+//             map((action: websiteActions.Load) => action.payload),
+//             mergeMap((searchParams: ISearch) =>
+//                 this.websiteService.getWebsites(searchParams)
+//                     .pipe(
+//                         map(
+//                             websites => (new websiteActions.LoadSuccess(websites))
+//                          ),//map
+//                         catchError(err => of(new websiteActions.LoadFail(err)))
+//                     )//pipe
+//             )//mergeMap
+//         )//pipe
+
+// *****
+// In the component file:
+// *****
+// on init (import * as fromWebsites from './state/website.reducer';)
+// read this selector in the reducer.
+//         this.store
+//             .pipe(
+//                     select(fromWebsites.getWebsites),
+//                     takeWhile(() => this.componentActive)
+//                 )//pipe
+//             .subscribe(websites => {
+//                 this.websites = websites
+//             })//subscribe
+// On search dispatch an action to go load.
+// 	this.store.dispatch(new websiteActions.Load(searchParams));

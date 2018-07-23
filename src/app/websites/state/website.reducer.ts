@@ -24,7 +24,7 @@ const initialState: WebsiteState = {
     searchParams: new Search(),  //contains correct defaults
     websites: [],
     // currentWebsiteId: 0,
-    currentWebsite: new Website(),
+    currentWebsite: null,
     error: ''
 }
 
@@ -40,10 +40,6 @@ export const getWebsites = createSelector (
     getWebsiteFeatureState,
     state => state.websites
 );
-// export const getCurrentWebsiteId = createSelector (
-//     getWebsiteFeatureState,
-//     state => state.currentWebsiteId
-// );
 
 export const getCurrentWebsite = createSelector (
     getWebsiteFeatureState,
@@ -75,7 +71,7 @@ export function reducer (state = initialState, action: WebsiteActions): WebsiteS
         case WebsiteActionTypes.DeleteWebsiteSuccess:
             return {
                 ...state,
-                currentWebsite: null, //new Website(),  //spread?
+                currentWebsite: null,
                 // websites: state.websites.filter(website => website.websiteID !== action.payload),
                 error: ''
             }
@@ -104,6 +100,7 @@ export function reducer (state = initialState, action: WebsiteActions): WebsiteS
             }
 
         case WebsiteActionTypes.LoadCurrentWebsiteSuccess:
+// console.log('LoadCurrentWebsiteSuccess action.payload', action.payload);
             return {
                 ...state,
                 currentWebsite:  action.payload,

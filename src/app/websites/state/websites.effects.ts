@@ -34,7 +34,7 @@ export class WebsiteEffects {
             mergeMap((searchParams: ISearch) =>
                 this.websiteService.getWebsites(searchParams)
                     .pipe(
-                        // tap(val =>console.log('effects ',  val.length)),
+                        tap(val =>console.log('effects ',  val.length)),
                         map(
                             websites => (new websiteActions.LoadSuccess(websites))
                          ),//map
@@ -67,6 +67,7 @@ export class WebsiteEffects {
             map((action: websiteActions.LoadCurrentWebsite) => action.payload),
             mergeMap((websiteID: number) =>
                 this.websiteService.getWebsiteById(websiteID).pipe(
+                    // tap(website => console.log('effects4', website)),
                     map(website => (new websiteActions.LoadCurrentWebsiteSuccess(website))),
                     catchError(err => of(new websiteActions.LoadCurrentWebsiteFail(err))
                 )//pipe
