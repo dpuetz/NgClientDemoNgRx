@@ -1,9 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Router, ActivatedRoute} from '@angular/router';
+import { Router} from '@angular/router';
 import { IWebsite, Website } from './IWebsite';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
 import { IMessage, Message } from '../shared/imessage';
-import { debounceTime, takeWhile } from 'rxjs/operators';
+import { debounceTime, takeWhile, tap } from 'rxjs/operators';
 import { PurchaseParameterService } from './purchase-parameter.service';
 import * as fromWebsites from './state/website.reducer';
 import * as websiteActions from './state/website.action';
@@ -33,8 +33,7 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
 
     private validationMessages: { [key: string]: { [key: string]: string } };
 
-    constructor(  private route: ActivatedRoute,
-                  private router: Router,
+    constructor(  private router: Router,
                   private fb: FormBuilder,
                   private purchaseParams: PurchaseParameterService,
                   private store: Store<fromWebsites.State>) {
@@ -51,29 +50,105 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
 
     ngOnInit() {
         this.createWebsiteForm();
-        this.addWebsiteToStore();
-        this.getWebsiteFromStore();
+        this.watchCurrentWebsite();
         this.watchForUrlChanges();
         this.watchForNameChanges();
         this.watchForErrors();
     }
 
-    addWebsiteToStore(): void {
-        //get the id from the route
-        let websiteId = 0;
-        this.route.params.subscribe( params =>  websiteId = +params['id']);
+    watchCurrentWebsite() {
+        //get currentWebsite from store
+        //everytime the store returns a new currentWebsite, we are doing one of these things:
+        //1. loading the component
+        //2. coming back from an update
+        //3. coming back from a delete
+        this.store
+            .pipe(
+                    select(fromWebsites.getCurrentWebsite),
+                    takeWhile(() => this.componentActive),
+                    tap(val=> console.log('watchCurrentWebsite val', val))
+                )//pipe
+                .subscribe(website => {
+                    if (website ) {
+                        this.onLoadWebsiteForm(website);
+                        //if we just saved this site, then give message
+                        if (this.websiteSaved) {
+                            this.websiteSaved = false;
+                            this.popup = new Message('timedAlert', 'Save was successful!', "", 1000);
+                        }
+                    } else {
+                        //we don't have a website
+                        //we may have deleted it.
+                        if (this.websiteDeleted) {
+                            this.websiteDeleted = false;
+                            //show success msg for 1 sec then route back to websites list
+                            this.popup = new Message('timedAlert', 'Delete was successful!', "", 1000);
+                            setTimeout (() => {
+                                this.router.navigate(['/websites']);
+                            }, 1000);
+                        } else {
+                            //else //TODO  this is an unhandled error.
+                        }
+                    }
+                })//subscribe
+    }//watchCurrentWebsite
 
-        if (websiteId === 0) {
-            //store an initialized website
-            this.store.dispatch(new websiteActions.InitializeCurrentWebsite());
-        } else if (websiteId > 0) {
-            //call http to store new website
-            this.store.dispatch(new websiteActions.LoadCurrentWebsite(websiteId));
-        } else {
-            this.popup = new Message('alert', 'Sorry, an error has occurred while loading the website.', "", 0);
+    onLoadWebsiteForm(website: IWebsite): void {
+        if (website && this.websiteForm) {
+
+            this.website = website;
+
+            //reset validation values and empty values
+            this.websiteForm.reset();
+
+            // Update the data on the form
+            this.websiteForm.patchValue({  //have to use patchValue not setValue because ? fb.array needs patchValue
+                url: this.website.url,
+                websiteName: this.website.websiteName,
+                username: this.website.username,
+                email: this.website.email,
+                password: this.website.password,
+                notes: this.website.notes,
+                preferred: this.website.preferred,
+                isBill: this.website.isBill
+            });
+            this.websiteNameDisplay = this.website.websiteName;
+            window.scrollTo(0, 0);
         }
-    }//addWebsiteToStore
+    } //onLoadWebsiteForm
 
+    newWebsite(): void {
+        this.store.dispatch(new websiteActions.InitializeCurrentWebsite);
+        // this.router.navigate(['/websites', '0', 'detail']);
+    }
+
+    /////////deleting
+    deleteIt(): void{
+        this.popup = new Message('confirm', 'Are sure you want to delete this website and all it\'s purchases ?', "onComplete", 0);
+    }
+    onComplete(event:any):void {
+        //they have just confirmed the delete
+        this.websiteDeleted = true;
+        this.store.dispatch(new websiteActions.DeleteWebsite(this.website.websiteID));
+    }//onComplete
+
+    /////////saving
+    saveIt(): void{
+        // this.website: original data bound to template
+        // this.websiteForm.value: new form data on template now
+        // let w = Object.assign({}, this.website, this.websiteForm.value);
+        let w = {...this.website, ...this.websiteForm.value};
+        // console.log('saving website', w);  //w: object with new form data
+        this.websiteSaved = true;
+        this.store.dispatch(new websiteActions.UpdateWebsite(w));
+
+    }//save it
+
+    openWebsite(): void{
+        if (this.website.url && this.website.url.length > 0) {
+            let win=window.open(this.website.url, '_blank');
+        }
+    }
     createWebsiteForm():void {
         this.websiteForm = this.fb.group({
             url:        ['', [Validators.pattern('https?://.+')]],
@@ -147,96 +222,6 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
         } //switch
 
     } //setMessage
-
-    getWebsiteFromStore() {
-        //get current website when it's ready
-        this.store
-            .pipe(
-                    select(fromWebsites.getCurrentWebsite),
-                    takeWhile(() => this.componentActive)
-                )//pipe
-                .subscribe(website => {
-                    // console.log('website', website);
-                    if (website ) {
-                        this.onLoadWebsiteForm(website);
-                        //if we just saved this site, then give message
-                        if (this.websiteSaved) {
-                            this.websiteSaved = false;
-                            this.popup = new Message('timedAlert', 'Save was successful!', "", 1000);
-                        }
-                    } else {
-                        //we don't have a website
-                        //we may have deleted it.
-                        if (this.websiteDeleted) {
-                            this.websiteDeleted = false;
-                            //show success msg for 1 sec then route back to websites list
-                            this.popup = new Message('timedAlert', 'Delete was successful!', "", 1000);
-                            setTimeout (() => {
-                                this.router.navigate(['/websites']);
-                            }, 1000);
-                        }
-                        //else we didn't delete it, but no website is there to load yet. Do nothing.
-                    }
-                })//subscribe
-    }//getWebsiteFromStore
-
-    onLoadWebsiteForm(website: IWebsite): void {
-        if (website && this.websiteForm) {
-
-            this.website = website;
-
-            //reset validation values and empty values
-            this.websiteForm.reset();
-
-            // Update the data on the form
-            this.websiteForm.patchValue({  //have to use patchValue not setValue because ? fb.array needs patchValue
-                url: this.website.url,
-                websiteName: this.website.websiteName,
-                username: this.website.username,
-                email: this.website.email,
-                password: this.website.password,
-                notes: this.website.notes,
-                preferred: this.website.preferred,
-                isBill: this.website.isBill
-            });
-            this.websiteNameDisplay = this.website.websiteName;
-            window.scrollTo(0, 0);
-        }
-    } //onLoadWebsiteForm
-
-    newWebsite(): void {
-        this.store.dispatch(new websiteActions.InitializeCurrentWebsite);
-        this.router.navigate(['/websites', '0', 'detail']);
-    }
-
-    /////////deleting
-    deleteIt(): void{
-        this.popup = new Message('confirm', 'Are sure you want to delete this website and all it\'s purchases ?', "onComplete", 0);
-    }
-    onComplete(event:any):void {
-        //they have just confirmed the delete
-        this.websiteDeleted = true;
-        this.store.dispatch(new websiteActions.DeleteWebsite(this.website.websiteID));
-    }//onComplete
-
-    /////////saving
-    saveIt(): void{
-        // this.website: original data bound to template
-        // this.websiteForm.value: new form data on template now
-        // let w = Object.assign({}, this.website, this.websiteForm.value);
-        let w = {...this.website, ...this.websiteForm.value};
-        console.log('saving website', w);  //w: object with new form data
-        this.websiteSaved = true;
-        this.store.dispatch(new websiteActions.UpdateWebsite(w));
-
-    }//save it
-
-    openWebsite(): void{
-        if (this.website.url && this.website.url.length > 0) {
-            let win=window.open(this.website.url, '_blank');
-        }
-    }
-
     ngOnDestroy(): void {
         this.componentActive = false;
     }

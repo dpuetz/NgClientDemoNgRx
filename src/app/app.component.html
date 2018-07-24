@@ -1,5 +1,9 @@
 
-<span class="glyphicon glyphicon-refresh glyphicon-spin spinner" *ngIf="loading"></span>
+<span class="glyphicon glyphicon-refresh glyphicon-spin spinner"
+    [style.display] ="loading? 'inline': 'none'"></span>
+<!-- get error: ExpressionChangedAfterItHasBeenCheckedError when go back to websites component
+from websites-detail component if use ngIf here, so use style.display instead -->
+
 <app-header></app-header>
 <router-outlet></router-outlet>
 

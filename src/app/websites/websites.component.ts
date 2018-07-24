@@ -1,12 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Website } from './IWebsite'
+import { Website, IWebsite } from './IWebsite'
 import { ISearch } from './ISearch';
 import { IMessage, Message } from '../shared/imessage';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
 import * as fromWebsites from './state/website.reducer';
 import * as websiteActions from './state/website.action';
-import { takeWhile } from 'rxjs/operators';
+import { takeWhile, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
 @Component({
@@ -21,6 +21,7 @@ export class WebsitesComponent implements OnInit, OnDestroy {
     popup : IMessage;
     searchForm: FormGroup;
     componentActive = true;
+    navigateAfter: boolean;
 
     constructor( private fb: FormBuilder,
                  private store: Store<fromWebsites.State>,
@@ -54,9 +55,11 @@ export class WebsitesComponent implements OnInit, OnDestroy {
                 console.log('err', JSON.stringify(err));
                 if(err) {
                     this.store.dispatch(new websiteActions.ClearCurrentError());
-                    this.popup = new Message('alert', 'Sorry, an error has occurred.', "", 0);
+                    this.showError();
                 }
             })//subscribe
+
+        // this.watchCurrentWebsite();
 
         this.searchForm = this.fb.group({
             searchWord: this.search.searchWord,
@@ -65,7 +68,6 @@ export class WebsitesComponent implements OnInit, OnDestroy {
         });
         this.getWebsites();
     }
-
     searchCheckboxChanged() {
         this.doCheckSearch();
     }
@@ -89,15 +91,20 @@ export class WebsitesComponent implements OnInit, OnDestroy {
         this.store.dispatch(new websiteActions.Load(searchParams));
     }//getWebsites
 
-    goToSelectedWebsite(website): void {
+    goToSelectedWebsite(website: IWebsite): void {
+        //update the store and navigate
+        this.navigateAfter = true;
         if (website) {
-            this.router.navigate(['/websites', website.websiteID, 'detail']);
+            this.store.dispatch(new websiteActions.LoadCurrentWebsite(website.websiteID));
         } else {
-            this.router.navigate(['/websites', '0', 'detail']);
+            this.store.dispatch(new websiteActions.InitializeCurrentWebsite());
         }
-
+        this.router.navigate(['/websites', 'detail']);
     }
 
+    showError(): void{
+        this.popup = new Message('alert', 'Sorry, an error has occurred.', "", 0);
+    }
     ngOnDestroy() {
 		this.componentActive = false;
 	}

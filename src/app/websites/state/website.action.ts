@@ -26,22 +26,14 @@ export class SetSearchParams implements Action {
     readonly type = WebsiteActionTypes.SetSearchParams
     constructor (public payload: ISearch){}
 }
-
-// export class SetCurrentWebsiteId implements Action {
-//     readonly type = WebsiteActionTypes.SetCurrentWebsiteId
-//     constructor (public payload: number){}
-// }
-
 export class DeleteWebsite implements Action {
     readonly type = WebsiteActionTypes.DeleteWebsite
     constructor (public payload: number){}
 }
-
 export class DeleteWebsiteSuccess implements Action {
     readonly type = WebsiteActionTypes.DeleteWebsiteSuccess
     constructor (public payload: number){}
 }
-
 export class DeleteWebsiteFail implements Action {
     readonly type = WebsiteActionTypes.DeleteWebsiteFail
     constructor (public payload: string){}
@@ -50,17 +42,14 @@ export class ClearCurrentError implements Action {
     readonly type = WebsiteActionTypes.ClearCurrentError
     constructor (){}
 }
-
 export class InitializeCurrentWebsite implements Action {
     readonly type = WebsiteActionTypes.InitializeCurrentWebsite
     constructor (){}  //no payload
 }
-
 export class Load implements Action {
     readonly type = WebsiteActionTypes.Load
     constructor (public payload: ISearch){}
 }
-
 export class LoadSuccess implements Action {
     readonly type = WebsiteActionTypes.LoadSuccess
     constructor (public payload: IWebsite[]){}
@@ -105,7 +94,6 @@ export class LoadCurrentWebsiteFail implements Action {
 
 export type WebsiteActions =
           SetSearchParams
-        // | SetCurrentWebsiteId
         | DeleteWebsite
         | DeleteWebsiteSuccess
         | DeleteWebsiteFail

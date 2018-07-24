@@ -1,13 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, AfterContentInit } from '@angular/core';
 import { Router, Event, NavigationStart, NavigationEnd, NavigationError, NavigationCancel } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html'
 })
-export class AppComponent {
+export class AppComponent {  // implements AfterContentInit
 
-    loading: boolean = true;
+    loading: boolean;
 
     constructor( private router:Router) {
         router.events.subscribe(
@@ -15,7 +15,6 @@ export class AppComponent {
                 this.checkRouterEvent(routerEvent);
             }
         );  // subscribe
-
     } //constructor
 
     checkRouterEvent(routerEvent: Event) : void {

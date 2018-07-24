@@ -57,15 +57,6 @@ export function reducer (state = initialState, action: WebsiteActions): WebsiteS
                 ...state,
                 searchParams: {...action.payload}
             }
-        // case WebsiteActionTypes.SetCurrentWebsiteId:
-        //     return {
-        //         ...state,
-        //         currentWebsiteId: action.payload
-        //         //if payload is an object
-        //         //if you don't use the ..., it will pass by value.
-        //         //need a whole new object to prevent that.
-        //         //else the store will get updated when you change a website
-        //     }
         case WebsiteActionTypes.DeleteWebsiteSuccess:
             return {
                 ...state,
@@ -98,6 +89,7 @@ export function reducer (state = initialState, action: WebsiteActions): WebsiteS
             }
 
         case WebsiteActionTypes.LoadCurrentWebsiteSuccess:
+console.log('LoadCurrentWebsiteSuccess payload', action.payload);
             return {
                 ...state,
                 currentWebsite:  action.payload,
