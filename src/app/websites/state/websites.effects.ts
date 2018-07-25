@@ -96,9 +96,9 @@ export class WebsiteEffects {
         .pipe(
             ofType(websiteActions.WebsiteActionTypes.LoadCurrentPurchase),
             map((action: websiteActions.LoadCurrentPurchase) => action.payload),
+            // tap(val => console.log('effect loadCurrentPurchase', val)),
             mergeMap((action) =>
                 this.websiteService.getPurchase(action.websiteID, action.purchaseID).pipe(
-tap(val => console.log('effect loadCurrentPurchase', val)),
                     map(purchase => (new websiteActions.LoadCurrentPurchaseSuccess(purchase))),
                     catchError(err => of(new websiteActions.LoadCurrentWebsiteFail(err))
                 )//pipe

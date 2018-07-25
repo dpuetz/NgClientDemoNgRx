@@ -6,6 +6,7 @@ import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/fo
 import { IMessage, Message } from '../shared/imessage';
 import { debounceTime, takeWhile } from 'rxjs/operators';
 import * as fromWebsites from './state/website.reducer';
+import * as websiteActions from './state/website.action';
 import { Store, select } from '@ngrx/store';
 
 @Component({
@@ -39,6 +40,7 @@ export class PurchaseComponent implements OnInit, OnDestroy {
     }//constructor
 
     ngOnInit():void {
+        this.watchForErrors();
         this.createPurchaseForm();
         this.watchCurrentProduct();
         this.watchProductName();
@@ -52,7 +54,6 @@ export class PurchaseComponent implements OnInit, OnDestroy {
                 )
                 .subscribe(currentPurchase => {
                     if (currentPurchase && this.purchaseForm) {
-
                         this.purchaseForm.reset();
                         this.purchase = currentPurchase;
 
@@ -71,9 +72,22 @@ export class PurchaseComponent implements OnInit, OnDestroy {
                     }
 
                 })//subscribe
-//TODO need to subscribe to errors
 
     }//watchCurrentProduct
+    watchForErrors () {
+            this.store
+                .pipe(
+                        select(fromWebsites.getError),
+                        takeWhile(() => this.componentActive)
+                    )//pipe
+                .subscribe(err => {
+                    console.log('err', JSON.stringify(err));
+                    if(err) {
+                        this.store.dispatch(new websiteActions.ClearCurrentError());
+                        this.popup = new Message('alert', 'Sorry, an error has occurred', "", 0);
+                    }
+                })//subscribe
+    }//watchForErrors
 
     getWebsiteInfo():void {
         this.store.pipe(
@@ -81,49 +95,13 @@ export class PurchaseComponent implements OnInit, OnDestroy {
                     takeWhile(() => this.componentActive),
                 )
                 .subscribe(currentWebsite => {
-                    this.websiteName = currentWebsite.websiteName;
-                    this.websiteId = currentWebsite.websiteID;
+                    if (currentWebsite) {
+                        this.websiteName = currentWebsite.websiteName;
+                        this.websiteId = currentWebsite.websiteID;
+                    }
                 })//subscribe
     }//getWebsiteInfo
 
-
-    // getPurchase(websiteId: number, purchaseId: number): void {
-
-    //     if (! websiteId || websiteId == 0) {
-    //         this.router.navigate(['/websites']);
-    //     }
-    //     else if (purchaseId == 0) {
-    //         this.purchase = new Purchase();
-    //         this.purchase.websiteID = this.websiteId;
-    //     }
-    //     else {
-    //         this.websiteService.getPurchase(websiteId, purchaseId)
-    //             .subscribe(purchase =>
-    //                 {
-    //                     if (!purchase) {
-    //                         this.showGetPurchaseErr();
-    //                     } else {
-    //                         this.purchase = purchase;
-    //                         this.purchaseForm.patchValue({
-    //                             purchaseID: this.purchase.purchaseID,
-    //                             productName: this.purchase.productName,
-    //                             purchasedOn:  this.purchase.purchasedOn,
-    //                             arrivedOn:  this.purchase.arrivedOn,
-    //                             totalAmount: this.purchase.totalAmount,
-    //                             shippingAmount:this.purchase.shippingAmount,
-    //                             notes: this.purchase.notes,
-    //                         });  //purchaseForm
-    //                         window.scrollTo(0, 0);
-    //                     }
-
-    //                 }); //subscribe
-    //     } //if
-
-    // }//getPurchase
-    // showGetPurchaseErr(): void {
-    //     this.popup = new Message('alert', 'Sorry, an error has occurred', "", 0);
-    //     window.scrollTo(0, 0);
-    // }
 
     ///////////deleting
     deleteIt(): void{

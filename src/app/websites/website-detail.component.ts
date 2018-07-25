@@ -224,23 +224,13 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
     } //setMessage
 
     goToPurchase(purchase: IPurchase): void {
-        //TODO actions for setting currentPurcase
         if (purchase) {
-            //websiteID: number,  purchaseID
-            // this.store.dispatch(new websiteActions.LoadCurrentPurchase(purchase.websiteID, purchase.purchaseID);
-            this.store.dispatch(new websiteActions.LoadCurrentPurchase( { websiteID: purchase.websiteID,  purchaseID: purchase.purchaseID});
-        } else {  // { websiteID: number,  purchaseID: number}
+            this.store.dispatch(new websiteActions.LoadCurrentPurchase( { websiteID: purchase.websiteID,  purchaseID:  purchase.purchaseID}));
+        } else {
             this.store.dispatch(new websiteActions.InitializeCurrentPurchase);
         }
         this.router.navigate(['/websites',  'purchase']);
     } //goToPurchase
-//    <!-- [routerLink]="['/websites', website.websiteID, 'purchase', purchase.purchaseID]" -->
-//                            <!-- [routerLink]="['/websites', 'purchase', purchase.purchaseID]"
-//                         [queryParams] = "{websiteName: website.websiteName}"> -->
-//                 <tbody>
-//                     <tr *ngFor="let purchase of website.lstPurchases"
-//                         role="button"
-//                         (click)="goToPurchase(purchase.purchaseID)"
 
     ngOnDestroy(): void {
         this.componentActive = false;

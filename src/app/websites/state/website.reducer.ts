@@ -3,7 +3,7 @@ import { IWebsite, Website } from "../IWebsite";
 import * as fromRoot from '../../state/app.state';
 import { createFeatureSelector, createSelector } from "@ngrx/store";
 import { WebsiteActions, WebsiteActionTypes } from "./website.action";
-import { IPurchase } from "../IPurchase";
+import { IPurchase, Purchase } from "../IPurchase";
 
 
 //interface for entire application state
@@ -80,7 +80,12 @@ export function reducer (state = initialState, action: WebsiteActions): WebsiteS
         case WebsiteActionTypes.InitializeCurrentWebsite:
             return {
                 ...state,
-                currentWebsite: new Website(),  //spread?
+                currentWebsite: new Website(),  
+            }
+        case WebsiteActionTypes.InitializeCurrentPurchase:
+            return {
+                ...state,
+                currentPurchase: new Purchase(),
             }
         case WebsiteActionTypes.LoadSuccess:
             return {
