@@ -41,17 +41,14 @@ export const getWebsites = createSelector (
     getWebsiteFeatureState,
     state => state.websites
 );
-
 export const getCurrentWebsite = createSelector (
     getWebsiteFeatureState,
     state => state.currentWebsite
 );
-
 export const getError = createSelector (
     getWebsiteFeatureState,
     state => state.error
 );
-
 export const getCurrentPurchase = createSelector (
     getWebsiteFeatureState,
     state => state.currentPurchase
@@ -80,7 +77,7 @@ export function reducer (state = initialState, action: WebsiteActions): WebsiteS
         case WebsiteActionTypes.InitializeCurrentWebsite:
             return {
                 ...state,
-                currentWebsite: new Website(),  
+                currentWebsite: new Website(),
             }
         case WebsiteActionTypes.InitializeCurrentPurchase:
             return {
@@ -105,7 +102,6 @@ export function reducer (state = initialState, action: WebsiteActions): WebsiteS
             return {
                 ...state,
                 currentWebsite:  action.payload,
-                // currentWebsite:  {...action.payload}, //returns IWebsite
                 error: ''
             }
         case WebsiteActionTypes.LoadCurrentWebsiteFail:
@@ -119,18 +115,18 @@ export function reducer (state = initialState, action: WebsiteActions): WebsiteS
                 ...state,
                 error: ''
             }
- 	case WebsiteActionTypes.UpdateWebsiteSuccess:
- 		return {
- 			...state,
- 			currentWebsite:  action.payload,
- 			error: ''
- 		}
- 	case WebsiteActionTypes.UpdateWebsiteFail:
- 		return {
- 			...state,
- 			currentWebsite: null,
- 			error: action.payload
- 		}
+        case WebsiteActionTypes.UpdateWebsiteSuccess:
+            return {
+                ...state,
+                currentWebsite:  action.payload,
+                error: ''
+            }
+        case WebsiteActionTypes.UpdateWebsiteFail:
+            return {
+                ...state,
+                currentWebsite: null,
+                error: action.payload
+            }
         case WebsiteActionTypes.LoadCurrentPurchaseSuccess:
             return {
                 ...state,
@@ -139,6 +135,18 @@ export function reducer (state = initialState, action: WebsiteActions): WebsiteS
                 error: ''
             }
         case WebsiteActionTypes.LoadCurrentPurchaseFail:
+            return {
+                ...state,
+                currentPurchase: null,
+                error: action.payload
+            }
+        case WebsiteActionTypes.UpdatePurchaseSuccess:
+            return {
+                ...state,
+                currentPurchase:  action.payload,
+                error: ''
+            }
+        case WebsiteActionTypes.UpdatePurchaseFail:
             return {
                 ...state,
                 currentPurchase: null,

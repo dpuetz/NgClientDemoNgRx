@@ -71,7 +71,7 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
                 )//pipe
                 .subscribe(website => {
                     if (website ) {
-                        this.onLoadWebsiteForm(website);
+                        this.loadWebsiteForm(website);
                         //if we just saved this site, then give message
                         if (this.websiteSaved) {
                             this.websiteSaved = false;
@@ -88,13 +88,17 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
                                 this.router.navigate(['/websites']);
                             }, 1000);
                         } else {
-                            //else //TODO  this is an unhandled error.
+                            //if we are starting a new website, it has already been initialized in the store,
+                            //and won't end up here, we have already loaded it.
+                            //if we have a null current website, we shouldn't be on this page at all.
+                            //can happen if they reload the webpage or bookmark.
+                            this.router.navigate(['/websites']);
                         }
                     }
                 })//subscribe
     }//watchCurrentWebsite
 
-    onLoadWebsiteForm(website: IWebsite): void {
+    loadWebsiteForm(website: IWebsite): void {
         if (website && this.websiteForm) {
 
             this.website = website;
@@ -114,9 +118,9 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
                 isBill: this.website.isBill
             });
             this.websiteNameDisplay = this.website.websiteName;
-            window.scrollTo(0, 0);
+            // window.scrollTo(0, 0);
         }
-    } //onLoadWebsiteForm
+    } //loadWebsiteForm
 
     newWebsite(): void {
         this.store.dispatch(new websiteActions.InitializeCurrentWebsite);

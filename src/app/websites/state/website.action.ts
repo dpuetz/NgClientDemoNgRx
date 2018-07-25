@@ -23,6 +23,9 @@ export enum WebsiteActionTypes {
 	LoadCurrentPurchaseSuccess = '[Website] Load Current Purchase Success',
 	LoadCurrentPurchaseFail = '[Website] Load Current Purchase Fail',
 	InitializeCurrentPurchase = '[Website] Initialize Current Purchase',
+    UpdatePurchase = '[Website] Update Purchase',
+	UpdatePurchaseSuccess = '[Website] Update Purchase Success',
+	UpdatePurchaseFail = '[Website] Update Purchase Fail'
 }
 
 
@@ -68,8 +71,7 @@ export class UpdateWebsite implements Action {
 }
 export class UpdateWebsiteSuccess implements Action {
     readonly type = WebsiteActionTypes.UpdateWebsiteSuccess
-    // constructor (public payload: IWebsite){} //??
-    constructor (public payload: IWebsite){}  //??
+    constructor (public payload: IWebsite){}
 }
 export class UpdateWebsiteFail implements Action {
     readonly type = WebsiteActionTypes.UpdateWebsiteFail
@@ -103,6 +105,18 @@ export class LoadCurrentPurchaseFail implements Action {
     readonly type = WebsiteActionTypes.LoadCurrentPurchaseFail
     constructor (public payload: string){}
 }
+export class UpdatePurchase implements Action {
+    readonly type = WebsiteActionTypes.UpdatePurchase
+    constructor (public payload: IPurchase){}
+}
+export class UpdatePurchaseSuccess implements Action {
+    readonly type = WebsiteActionTypes.UpdatePurchaseSuccess
+    constructor (public payload: IPurchase){}  //savePurchase(purchase: IPurchase): Observable<IPurchase>{
+}
+export class UpdatePurchaseFail implements Action {
+    readonly type = WebsiteActionTypes.UpdatePurchaseFail
+    constructor (public payload: string){}
+}
 
 
 export type WebsiteActions =
@@ -125,5 +139,8 @@ export type WebsiteActions =
 	    | LoadCurrentPurchaseSuccess
 	    | LoadCurrentPurchaseFail
 	    | InitializeCurrentPurchase
+        | UpdatePurchase
+        | UpdatePurchaseSuccess
+        | UpdatePurchaseFail
 
 

@@ -89,6 +89,20 @@ export class WebsiteEffects {
         )//mergemap
     ); //pipe
 
+    @Effect()
+    UpdatePurchase$: Observable<Action> = this.actions$
+        .pipe(
+            ofType(websiteActions.WebsiteActionTypes.UpdatePurchase),
+            map((action: websiteActions.UpdatePurchase) => action.payload),
+            mergeMap((purchase: IPurchase) =>
+                this.websiteService.savePurchase(purchase).pipe(
+                     map(websiteId => (new websiteActions.UpdatePurchaseSuccess(purchase))),
+                    catchError(err => of(new websiteActions.UpdatePurchaseFail(err))
+                )//pipe
+        )//pipe
+        )//mergemap
+    ); //pipe
+
 // constructor (public websiteID: number, public purchaseID: number){}  //websiteID: number, purchaseID: number
 //getPurchase(websiteID: number, purchaseID: number)
     @Effect()
@@ -105,28 +119,6 @@ export class WebsiteEffects {
         )//pipe
         )//mergemap
     ); //pipe
-//websiteID: number, purchaseID: number
-
-
-    //     .ofType(InvoiceActions.GET_INVOICE)
-    //     .switchMap((action) => this.invoiceService.getInvoice(
-    //     action.payload.invoiceNumber,
-    //     action.payload.zipCode
-    // ))
-    // .map(invoice => this.invoiceActions.getInvoiceResult(invoice))
-    //     .pipe(
-    //         ofType(websiteActions.WebsiteActionTypes.LoadCurrentPurchase),
-    //         switchMap
-    //         map((action: websiteActions.LoadCurrentPurchase) => action.websiteID, action.),
-    //         mergeMap((website: IWebsite) =>
-    //             this.websiteService.saveWebsite(website).pipe(
-    //                  map(websiteId => (new websiteActions.UpdateWebsiteSuccess(setWebsiteId(website, websiteId)))),
-    //                 catchError(err => of(new websiteActions.UpdateWebsiteFail(err))
-    //             )//pipe
-    //     )//pipe
-    //     )//mergemap
-    // ); //pipe
-
 
     //works, but don't need it.
     // @Effect()

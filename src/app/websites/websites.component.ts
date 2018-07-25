@@ -59,13 +59,12 @@ export class WebsitesComponent implements OnInit, OnDestroy {
                 }
             })//subscribe
 
-        // this.watchCurrentWebsite();
-
         this.searchForm = this.fb.group({
             searchWord: this.search.searchWord,
             isBill: this.search.isBill,
             isPreferred: this.search.isPreferred
         });
+        
         this.getWebsites();
     }
     searchCheckboxChanged() {
