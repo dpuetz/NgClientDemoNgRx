@@ -50,6 +50,11 @@ export class PurchaseComponent implements OnInit, OnDestroy {
     }
 
     watchCurrentProduct(): void {
+        //get purchase from store
+        //everytime the store returns a new purchase, we are doing one of these things:
+        //1. loading the component
+        //2. coming back from an update
+        //3. coming back from a delete
         this.store.pipe(
                     select(fromWebsites.getCurrentPurchase),
                     takeWhile(() => this.componentActive),
