@@ -74,6 +74,17 @@ export function reducer (state = initialState, action: WebsiteActions): WebsiteS
                 ...state,
                 error: action.payload
             }
+        case WebsiteActionTypes.DeletePurchaseSuccess:
+            return {
+                ...state,
+                currentPurchase: null,
+                error: ''
+            }
+        case WebsiteActionTypes.DeletePurchaseFail:
+            return {
+                ...state,
+                error: action.payload
+            }
         case WebsiteActionTypes.InitializeCurrentWebsite:
             return {
                 ...state,
@@ -143,7 +154,7 @@ export function reducer (state = initialState, action: WebsiteActions): WebsiteS
         case WebsiteActionTypes.UpdatePurchaseSuccess:
             return {
                 ...state,
-                currentPurchase:  action.payload,
+                currentPurchase:  {...action.payload},
                 error: ''
             }
         case WebsiteActionTypes.UpdatePurchaseFail:

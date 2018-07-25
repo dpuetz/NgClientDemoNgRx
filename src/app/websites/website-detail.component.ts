@@ -67,7 +67,7 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
             .pipe(
                     select(fromWebsites.getCurrentWebsite),
                     takeWhile(() => this.componentActive),
-                    tap(val=> console.log('watchCurrentWebsite val', val))
+                    // tap(val=> console.log('watchCurrentWebsite val', val))
                 )//pipe
                 .subscribe(website => {
                     if (website ) {
@@ -92,7 +92,9 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
                             //and won't end up here, we have already loaded it.
                             //if we have a null current website, we shouldn't be on this page at all.
                             //can happen if they reload the webpage or bookmark.
-                            this.router.navigate(['/websites']);
+                            //also get here if we are just loading the page, and the http call hasn't come back yet.
+                            //so don't route away.
+                            // this.router.navigate(['/websites']);
                         }
                     }
                 })//subscribe
@@ -199,8 +201,8 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
                     takeWhile(() => this.componentActive)
                 )//pipe
             .subscribe(err => {
-                console.log('err', JSON.stringify(err));
                 if(err) {
+                    console.log('website-detail err', JSON.stringify(err));
                     this.store.dispatch(new websiteActions.ClearCurrentError());
                     this.popup = new Message('alert', 'Sorry, an error has occurred', "", 0);
                 }

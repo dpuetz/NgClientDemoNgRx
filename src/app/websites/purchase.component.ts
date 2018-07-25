@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { WebsiteService } from './website.service';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
 import { IMessage, Message } from '../shared/imessage';
-import { debounceTime, takeWhile } from 'rxjs/operators';
+import { debounceTime, takeWhile, tap } from 'rxjs/operators';
 import * as fromWebsites from './state/website.reducer';
 import * as websiteActions from './state/website.action';
 import { Store, select } from '@ngrx/store';
@@ -24,6 +24,7 @@ export class PurchaseComponent implements OnInit, OnDestroy {
     a2eOptions: any = {format: 'M/D/YYYY'};
     componentActive = true;
     purchaseSaved = false;
+    purchaseDeleted = false;
     private validationMessages: { [key: string]: { [key: string]: string } };
 
     constructor(
@@ -64,20 +65,29 @@ export class PurchaseComponent implements OnInit, OnDestroy {
                             this.popup = new Message('timedAlert', 'Save was successful!', "", 1000);
                         }
                     }
-                    // else {
-                    //     //we don't have a website
-                    //     //we may have deleted it.
-                    //     if (this.websiteDeleted) {
-                    //         this.websiteDeleted = false;
-                    //         //show success msg for 1 sec then route back to websites list
-                    //         this.popup = new Message('timedAlert', 'Delete was successful!', "", 1000);
-                    //         setTimeout (() => {
-                    //             this.router.navigate(['/websites']);
-                    //         }, 1000);
-                    //     } else {
-                    //         //else //TODO  this is an unhandled error.
-                    //     }
-                    // }
+                    else {
+                        //we don't have a purchase
+                        //we may have just deleted it.
+                        if (this.purchaseDeleted) {
+                            this.purchaseDeleted = false;
+                            //refresh current website in the store so this deleted purchase does not shows up in list when we navigate back to website-detail
+                            this.store.dispatch(new websiteActions.LoadCurrentWebsite(this.currentWebsite.websiteID));
+                            //show success msg for 1 sec then route back to website component
+                            this.popup = new Message('timedAlert', 'Delete was successful!', "", 1000);
+                            setTimeout (() => {
+                                this.router.navigate(['/websites', 'detail']);
+                            }, 1000);
+                        } else {
+                            //if we are starting a new purchase, it has already been initialized in the store,
+                            //and won't end up here because we have already gone to this.loadPurchaseForm(currentPurchase).
+                            //if we have a null purchase, we shouldn't be on this page at all.
+                            //can happen if they reload the page or bookmark.
+                            //we probably don't have the current website either, so go to websites list
+                            //also get here if the page is loaded before the getpurchase http call comes back
+                            //so can't navigate way here.
+                            // this.router.navigate(['/websites']);
+                        }
+                    }
                 })//subscribe
 
     }//watchCurrentProduct
@@ -86,7 +96,6 @@ export class PurchaseComponent implements OnInit, OnDestroy {
         if (purchase && this.purchaseForm) {
             this.purchaseForm.reset();
             this.purchase = purchase;
-
             this.purchaseForm.patchValue({
                 purchaseID: this.purchase.purchaseID,
                 productName: this.purchase.productName,
@@ -109,8 +118,8 @@ export class PurchaseComponent implements OnInit, OnDestroy {
                         takeWhile(() => this.componentActive)
                     )//pipe
                 .subscribe(err => {
-                    console.log('err', JSON.stringify(err));
                     if(err) {
+                        console.log('err', JSON.stringify(err));
                         this.store.dispatch(new websiteActions.ClearCurrentError());
                         this.popup = new Message('alert', 'Sorry, an error has occurred', "", 0);
                     }
@@ -121,6 +130,7 @@ export class PurchaseComponent implements OnInit, OnDestroy {
         this.store.pipe(
                     select(fromWebsites.getCurrentWebsite),
                     takeWhile(() => this.componentActive),
+                    // tap(newWebsiteInfo => console.log('newWebsiteInfo', newWebsiteInfo))
                 )
                 .subscribe(currentWebsite => {
                     if (currentWebsite) {
@@ -138,24 +148,10 @@ export class PurchaseComponent implements OnInit, OnDestroy {
     deleteIt(): void{
         this.popup = new Message('confirm', 'Are sure you want to delete this purchase?', "onComplete", 0);
     }
-
     onComplete(event:any):void {
         //they have just confirmed the delete
-        //if they confirm in the message-component dialog launched by this.deleteIt();
-                this.websiteService.deletePurchase(this.purchase.purchaseID, this.currentWebsite.websiteID)
-                .subscribe(val =>
-                    {
-                            //show success msg for 1 sec and route back to the website
-                            this.popup = new Message('timedAlert', 'Delete was successful!', "", 1000);
-                            setTimeout (() => {
-                                this.router.navigate(['/websites', 'detail' ]);
-                            }, 1000);
-                        },
-                        error =>
-                        {
-                            this.popup = new Message('alert', 'Sorry, an error occurred while deleting the purchase.', "", 0);
-                        }
-                );//subscribe
+        this.purchaseDeleted = true;
+        this.store.dispatch(new websiteActions.DeletePurchase({purchaseID: this.purchase.purchaseID, websiteID: this.purchase.websiteID}));
     }//onComplete
 
     saveIt(): void {

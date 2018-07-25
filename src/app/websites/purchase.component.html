@@ -104,7 +104,8 @@
                             [disabled]="!purchaseForm.valid">Save</button>
                     </div>
                     <div class="pull-left bottom-right-space " >
-                      <button class="btn btn-info" type="button" (click)="deleteIt();"  *ngIf = "purchase.purchaseID">Delete</button>
+                      <button class="btn btn-info" type="button" (click)="deleteIt();"
+                            *ngIf = "purchase.purchaseID">Delete</button>
                     </div>
                     <div class="pull-left bottom-right-space" >
                       <button class="btn btn-info"  type="button"

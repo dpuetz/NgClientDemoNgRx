@@ -25,7 +25,10 @@ export enum WebsiteActionTypes {
 	InitializeCurrentPurchase = '[Website] Initialize Current Purchase',
     UpdatePurchase = '[Website] Update Purchase',
 	UpdatePurchaseSuccess = '[Website] Update Purchase Success',
-	UpdatePurchaseFail = '[Website] Update Purchase Fail'
+	UpdatePurchaseFail = '[Website] Update Purchase Fail',
+    DeletePurchase = '[Website] Delete Purchase',
+	DeletePurchaseSuccess = '[Website] Delete Purchase Success',
+	DeletePurchaseFail = '[Website] Delete Purchase Fail'
 }
 
 
@@ -117,7 +120,18 @@ export class UpdatePurchaseFail implements Action {
     readonly type = WebsiteActionTypes.UpdatePurchaseFail
     constructor (public payload: string){}
 }
-
+export class DeletePurchase implements Action {
+    readonly type = WebsiteActionTypes.DeletePurchase //deletePurchase(purchaseID: number, websiteID: number)Observable<boolean>
+    constructor (public payload:  { purchaseID: number, websiteID: number}){}
+}
+export class DeletePurchaseSuccess implements Action {
+    readonly type = WebsiteActionTypes.DeletePurchaseSuccess
+    constructor (public payload: boolean){}
+}
+export class DeletePurchaseFail implements Action {
+    readonly type = WebsiteActionTypes.DeletePurchaseFail
+    constructor (public payload: string){}
+}
 
 export type WebsiteActions =
           SetSearchParams
@@ -142,5 +156,7 @@ export type WebsiteActions =
         | UpdatePurchase
         | UpdatePurchaseSuccess
         | UpdatePurchaseFail
-
+        | DeletePurchase
+        | DeletePurchaseSuccess
+        | DeletePurchaseFail
 
