@@ -3,6 +3,7 @@ import { IWebsite, Website } from "../IWebsite";
 import * as fromRoot from '../../state/app.state';
 import { createFeatureSelector, createSelector } from "@ngrx/store";
 import { WebsiteActions, WebsiteActionTypes } from "./website.action";
+import { IPurchase } from "../IPurchase";
 
 
 //interface for entire application state
@@ -15,6 +16,7 @@ export interface WebsiteState {
     searchParams: ISearch,
     websites: IWebsite[],
     currentWebsite: IWebsite,
+    currentPurchase: IPurchase,
     error: string
 }
 
@@ -23,6 +25,7 @@ const initialState: WebsiteState = {
     searchParams: new Search(),  //contains correct defaults
     websites: [],
     currentWebsite: null,
+    currentPurchase: null,
     error: ''
 }
 
@@ -47,6 +50,11 @@ export const getCurrentWebsite = createSelector (
 export const getError = createSelector (
     getWebsiteFeatureState,
     state => state.error
+);
+
+export const getCurrentPurchase = createSelector (
+    getWebsiteFeatureState,
+    state => state.currentPurchase
 );
 
 //use optional parameters to set the state to the initial state
@@ -89,7 +97,6 @@ export function reducer (state = initialState, action: WebsiteActions): WebsiteS
             }
 
         case WebsiteActionTypes.LoadCurrentWebsiteSuccess:
-console.log('LoadCurrentWebsiteSuccess payload', action.payload);
             return {
                 ...state,
                 currentWebsite:  action.payload,
@@ -119,6 +126,19 @@ console.log('LoadCurrentWebsiteSuccess payload', action.payload);
  			currentWebsite: null,
  			error: action.payload
  		}
+        case WebsiteActionTypes.LoadCurrentPurchaseSuccess:
+            return {
+                ...state,
+                currentPurchase:  action.payload,
+                // currentWebsite:  {...action.payload}, //returns IWebsite
+                error: ''
+            }
+        case WebsiteActionTypes.LoadCurrentPurchaseFail:
+            return {
+                ...state,
+                currentPurchase: null,
+                error: action.payload
+            }
         default:
             return state;
     }//switch

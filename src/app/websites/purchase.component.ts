@@ -1,15 +1,12 @@
 import { Component,  OnDestroy, OnInit } from '@angular/core';
 import { IPurchase, Purchase } from './IPurchase'
-import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
+import { Router } from '@angular/router';
 import { WebsiteService } from './website.service';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
 import { IMessage, Message } from '../shared/imessage';
-import { Subscription } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
-// import { PurchaseParameterService } from './purchase-parameter.service';
+import { debounceTime, takeWhile } from 'rxjs/operators';
 import * as fromWebsites from './state/website.reducer';
 import { Store, select } from '@ngrx/store';
-
 
 @Component({
   templateUrl: './purchase.component.html',
@@ -17,35 +14,21 @@ import { Store, select } from '@ngrx/store';
 })
 
 export class PurchaseComponent implements OnInit, OnDestroy {
-
-    purchase: IPurchase;
+    purchase: IPurchase = new Purchase();
     websiteName: string;
     websiteId: number;
     productNameMsg:string;
     purchaseForm: FormGroup;
     popup : IMessage;
-    navigationSubscription: Subscription;
-    subProductName: Subscription;
     a2eOptions: any = {format: 'M/D/YYYY'};
     componentActive = true;
     private validationMessages: { [key: string]: { [key: string]: string } };
 
     constructor(
-        private route: ActivatedRoute,
         private router: Router,
         private websiteService: WebsiteService,
         private fb: FormBuilder,
-        // private purchaseParams: PurchaseParameterService,
-        private store: Store<fromWebsites.State>
-    ) {
-//TODO remove navigationSubscription
-//TODO add way to remove all subscriptssions
-            // this.navigationSubscription = this.router.events.subscribe((e: any) => {
-            //     // If it is a NavigationEnd event, then re-initalise the component
-            //     if (e instanceof NavigationEnd) {
-            //         this.initializePurchaseDetail();
-            //     }
-            // });
+        private store: Store<fromWebsites.State>) {
 
             // Define all of the validation messages for the form.
             this.validationMessages = {
@@ -57,78 +40,97 @@ export class PurchaseComponent implements OnInit, OnDestroy {
 
     ngOnInit():void {
         this.createPurchaseForm();
+        this.watchCurrentProduct();
         this.watchProductName();
-        this.initializePurchaseDetail();
-    }//ngOnInit
-
-    initializePurchaseDetail():void {    //re-set values and get the purchase
-        this.route.paramMap.subscribe(params => {
-
-            if (this.purchaseForm) {
-                this.purchaseForm.reset();
-            }
-
-            this.websiteName = '';
-            this.websiteId = 0;
-
-            let purchaseId = +params.get('purchaseId');
-            this.websiteId = +params.get('websiteId');
-
-            this.purchase = new Purchase();
-            this.purchase.websiteID = this.websiteId;
-
-            //read websitename from store
-            this.store.pipe(select(fromWebsites.getCurrentWebsite))
-                        .subscribe(currentWebsite => {
-                            this.websiteName = currentWebsite.websiteName
-                        })//subscribe
-
-//this.websiteName = this.purchaseParams.websiteName;
-            this.getPurchase(this.websiteId, purchaseId);
-        });
-
-    }//initializePurchaseDetail
-
-
-    getPurchase(websiteId: number, purchaseId: number): void {
-
-        if (! websiteId || websiteId == 0) {
-            this.router.navigate(['/websites']);
-        }
-        else if (purchaseId == 0) {
-            this.purchase = new Purchase();
-            this.purchase.websiteID = this.websiteId;
-        }
-        else {
-            this.websiteService.getPurchase(websiteId, purchaseId)
-                .subscribe(purchase =>
-                    {
-                        if (!purchase) {
-                            this.showGetPurchaseErr();
-                        } else {
-                            this.purchase = purchase;
-                            this.purchaseForm.patchValue({
-                                purchaseID: this.purchase.purchaseID,
-                                productName: this.purchase.productName,
-                                purchasedOn:  this.purchase.purchasedOn,
-                                arrivedOn:  this.purchase.arrivedOn,
-                                totalAmount: this.purchase.totalAmount,
-                                shippingAmount:this.purchase.shippingAmount,
-                                notes: this.purchase.notes,
-                            });  //purchaseForm
-                            window.scrollTo(0, 0);
-                        }
-
-                    }); //subscribe
-        } //if
-
-    }//getPurchase
-    showGetPurchaseErr(): void {
-        this.popup = new Message('alert', 'Sorry, an error has occurred', "", 0);
-        window.scrollTo(0, 0);
+        this.getWebsiteInfo();
     }
 
+    watchCurrentProduct(): void {   //re-set values and get the purchase
+        this.store.pipe(
+                    select(fromWebsites.getCurrentPurchase),
+                    takeWhile(() => this.componentActive),
+                )
+                .subscribe(currentPurchase => {
+                    if (currentPurchase && this.purchaseForm) {
+
+                        this.purchaseForm.reset();
+                        this.purchase = currentPurchase;
+
+                        this.purchaseForm.patchValue({
+                            purchaseID: this.purchase.purchaseID,
+                            productName: this.purchase.productName,
+                            purchasedOn:  this.purchase.purchasedOn,
+                            arrivedOn:  this.purchase.arrivedOn,
+                            totalAmount: this.purchase.totalAmount,
+                            shippingAmount:this.purchase.shippingAmount,
+                            notes: this.purchase.notes,
+                        });  //purchaseForm
+
+                        window.scrollTo(0, 0);
+
+                    }
+
+                })//subscribe
+//TODO need to subscribe to errors
+
+    }//watchCurrentProduct
+
+    getWebsiteInfo():void {
+        this.store.pipe(
+                    select(fromWebsites.getCurrentWebsite),
+                    takeWhile(() => this.componentActive),
+                )
+                .subscribe(currentWebsite => {
+                    this.websiteName = currentWebsite.websiteName;
+                    this.websiteId = currentWebsite.websiteID;
+                })//subscribe
+    }//getWebsiteInfo
+
+
+    // getPurchase(websiteId: number, purchaseId: number): void {
+
+    //     if (! websiteId || websiteId == 0) {
+    //         this.router.navigate(['/websites']);
+    //     }
+    //     else if (purchaseId == 0) {
+    //         this.purchase = new Purchase();
+    //         this.purchase.websiteID = this.websiteId;
+    //     }
+    //     else {
+    //         this.websiteService.getPurchase(websiteId, purchaseId)
+    //             .subscribe(purchase =>
+    //                 {
+    //                     if (!purchase) {
+    //                         this.showGetPurchaseErr();
+    //                     } else {
+    //                         this.purchase = purchase;
+    //                         this.purchaseForm.patchValue({
+    //                             purchaseID: this.purchase.purchaseID,
+    //                             productName: this.purchase.productName,
+    //                             purchasedOn:  this.purchase.purchasedOn,
+    //                             arrivedOn:  this.purchase.arrivedOn,
+    //                             totalAmount: this.purchase.totalAmount,
+    //                             shippingAmount:this.purchase.shippingAmount,
+    //                             notes: this.purchase.notes,
+    //                         });  //purchaseForm
+    //                         window.scrollTo(0, 0);
+    //                     }
+
+    //                 }); //subscribe
+    //     } //if
+
+    // }//getPurchase
+    // showGetPurchaseErr(): void {
+    //     this.popup = new Message('alert', 'Sorry, an error has occurred', "", 0);
+    //     window.scrollTo(0, 0);
+    // }
+
+    ///////////deleting
+    deleteIt(): void{
+        this.popup = new Message('confirm', 'Are sure you want to delete this purchase?', "onComplete", 0);
+    }
     onComplete(event:any):void {
+        //they have just confirmed the delete
         //if they confirm in the message-component dialog launched by this.deleteIt();
                 this.websiteService.deletePurchase(this.purchase.purchaseID, this.websiteId)
                 .subscribe(val =>
@@ -146,10 +148,8 @@ export class PurchaseComponent implements OnInit, OnDestroy {
                     );//subscribe
     }//onComplete
 
-    deleteIt(): void{
-        this.popup = new Message('confirm', 'Are sure you want to delete this purchase?', "onComplete", 0);
-    }
 
+    ///////////saving
     saveIt(): void {
 
         let p = Object.assign({}, this.purchase, this.purchaseForm.value);
@@ -179,13 +179,6 @@ export class PurchaseComponent implements OnInit, OnDestroy {
 
      ngOnDestroy() {
          this.componentActive = false;
-            // // !important - avoid memory leaks caused by navigationSubscription
-            // if (this.navigationSubscription) {
-            //     this.navigationSubscription.unsubscribe();
-            // }
-            // if (this.subProductName) {
-            //     this.subProductName.unsubscribe();
-            // }
      }
 
     setMessage(c: AbstractControl, name: string): void {
@@ -199,6 +192,7 @@ export class PurchaseComponent implements OnInit, OnDestroy {
                 break;
         } //switch
     } //setMessage
+
     createPurchaseForm(): void {
         this.purchaseForm = this.fb.group({
             purchaseID: 0,
@@ -210,10 +204,14 @@ export class PurchaseComponent implements OnInit, OnDestroy {
             notes:      '',
         });  //purchaseForm
     } //createPurchaseForm
+
     watchProductName(): void {
         const productNameControl = this.purchaseForm.get('productName');
-        this.subProductName = productNameControl.valueChanges
-                .pipe(debounceTime(100))
+        productNameControl.valueChanges
+                .pipe(
+                    debounceTime(100),
+                    takeWhile(() => this.componentActive)
+                )
                 .subscribe(value => {
                             this.setMessage(productNameControl, 'productName');
                         }

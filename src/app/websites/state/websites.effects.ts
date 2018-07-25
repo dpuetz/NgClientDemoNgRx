@@ -2,12 +2,13 @@ import { Injectable } from "@angular/core";
 import { WebsiteService } from "../website.service";
 import { Actions, Effect, ofType } from "@ngrx/effects";
 import * as websiteActions from './website.action';
-import { mergeMap, map, catchError, withLatestFrom, tap } from "rxjs/operators";
+import { mergeMap, map, catchError, withLatestFrom, tap, switchMap } from "rxjs/operators";
 import { Observable, of } from "rxjs";
 import { Action, Store } from "@ngrx/store";
 import { ISearch } from "../ISearch";
 import { IWebsite, setWebsiteId } from "../IWebsite";
 import * as fromWebsites from '../state/website.reducer';
+import { IPurchase } from "../IPurchase";
 
 @Injectable()
 export class WebsiteEffects {
@@ -87,6 +88,44 @@ export class WebsiteEffects {
         )//pipe
         )//mergemap
     ); //pipe
+
+// constructor (public websiteID: number, public purchaseID: number){}  //websiteID: number, purchaseID: number
+//getPurchase(websiteID: number, purchaseID: number)
+    @Effect()
+    loadCurrentPurchase$: Observable<Action> = this.actions$
+        .pipe(
+            ofType(websiteActions.WebsiteActionTypes.LoadCurrentPurchase),
+            map((action: websiteActions.LoadCurrentPurchase) => action.payload),
+            mergeMap((action) =>
+                this.websiteService.getPurchase(action.websiteID, action.purchaseID).pipe(
+tap(val => console.log('effect loadCurrentPurchase', val)),
+                    map(purchase => (new websiteActions.LoadCurrentPurchaseSuccess(purchase))),
+                    catchError(err => of(new websiteActions.LoadCurrentWebsiteFail(err))
+                )//pipe
+        )//pipe
+        )//mergemap
+    ); //pipe
+//websiteID: number, purchaseID: number
+
+
+    //     .ofType(InvoiceActions.GET_INVOICE)
+    //     .switchMap((action) => this.invoiceService.getInvoice(
+    //     action.payload.invoiceNumber,
+    //     action.payload.zipCode
+    // ))
+    // .map(invoice => this.invoiceActions.getInvoiceResult(invoice))
+    //     .pipe(
+    //         ofType(websiteActions.WebsiteActionTypes.LoadCurrentPurchase),
+    //         switchMap
+    //         map((action: websiteActions.LoadCurrentPurchase) => action.websiteID, action.),
+    //         mergeMap((website: IWebsite) =>
+    //             this.websiteService.saveWebsite(website).pipe(
+    //                  map(websiteId => (new websiteActions.UpdateWebsiteSuccess(setWebsiteId(website, websiteId)))),
+    //                 catchError(err => of(new websiteActions.UpdateWebsiteFail(err))
+    //             )//pipe
+    //     )//pipe
+    //     )//mergemap
+    // ); //pipe
 
 
     //works, but don't need it.

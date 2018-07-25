@@ -30,8 +30,9 @@
                             </li>
                             <!-- <a [routerLink]="['/websites', website.websiteID, 'purchase', 0]"
                             [queryParams]="{ websiteName: website.websiteName}" -->
+                            <!-- <a [routerLink]="['/websites', 'purchase', 0]">Add New Purchase</a> -->
                             <li *ngIf="website.websiteID > 0">
-                              <a [routerLink]="['/websites', 'purchase', 0]">Add New Purchase</a>
+                              <a [routerLink]="" (click)="goToPurchase(0)">Add New Purchase</a>
                             </li>
                           </ul>
             </div>
@@ -143,8 +144,9 @@
 
           <div class="form-group">
             <div *ngIf="website.websiteID > 0"  style="text-align:right;margin-bottom:10px;">
-              <a [routerLink]="['/websites', website.websiteID, 'purchase', 0]"
-                 [queryParams]="{ websiteName: website.websiteName}">Add New Purchase</a>
+              <!-- <a [routerLink]="['/websites', website.websiteID, 'purchase', 0]"
+                 [queryParams]="{ websiteName: website.websiteName}">Add New Purchase</a> -->
+              <a [routerLink]="" (click)="goToPurchase(0)">Add New Purchase</a>
             </div>
 
             <div class="table-responsive">
@@ -157,11 +159,12 @@
                   </tr>
                 </thead>
    <!-- [routerLink]="['/websites', website.websiteID, 'purchase', purchase.purchaseID]" -->
+                           <!-- [routerLink]="['/websites', 'purchase', purchase.purchaseID]"
+                        [queryParams] = "{websiteName: website.websiteName}"> -->
                 <tbody>
                     <tr *ngFor="let purchase of website.lstPurchases"
                         role="button"
-                        [routerLink]="['/websites', 'purchase', purchase.purchaseID]"
-                        [queryParams] = "{websiteName: website.websiteName}">
+                        (click)="goToPurchase(purchase.purchaseID)"
                       <td>{{purchase.productName}}</td>
                       <td>{{purchase.purchasedOn}}</td>
                       <td>{{purchase.arrivedOn}}</td>

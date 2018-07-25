@@ -1,10 +1,10 @@
 import { Action } from "@ngrx/store";
 import { IWebsite } from "../IWebsite";
 import { ISearch } from "../ISearch";
+import { IPurchase } from "../IPurchase";
 
 export enum WebsiteActionTypes {
     SetSearchParams = '[Website] Get Search Params',
-    // SetCurrentWebsiteId = '[Website] Set Current Website ID',
     DeleteWebsite = '[Website] Delete Website',
     DeleteWebsiteSuccess = '[Website] Delete Website Success',
     DeleteWebsiteFail = '[Website] Delete Website Fail',
@@ -18,7 +18,11 @@ export enum WebsiteActionTypes {
 	LoadCurrentWebsiteFail = '[Website Load Current Website Fail]',
     UpdateWebsite = '[Website] Update Website',
     UpdateWebsiteSuccess = '[Website] Update Website Success',
-    UpdateWebsiteFail = '[Website] Update Website Fail'
+    UpdateWebsiteFail = '[Website] Update Website Fail',
+	LoadCurrentPurchase = '[Website] Load Current Purchase',
+	LoadCurrentPurchaseSuccess = '[Website] Load Current Purchase Success',
+	LoadCurrentPurchaseFail = '[Website] Load Current Purchase Fail',
+	InitializeCurrentPurchase = '[Website] Initialize Current Purchase',
 }
 
 
@@ -54,43 +58,52 @@ export class LoadSuccess implements Action {
     readonly type = WebsiteActionTypes.LoadSuccess
     constructor (public payload: IWebsite[]){}
 }
-
 export class LoadFail implements Action {
     readonly type = WebsiteActionTypes.LoadFail
     constructor (public payload: string){}
 }
-
 export class UpdateWebsite implements Action {
     readonly type = WebsiteActionTypes.UpdateWebsite
     constructor (public payload: IWebsite){}
 }
-
 export class UpdateWebsiteSuccess implements Action {
     readonly type = WebsiteActionTypes.UpdateWebsiteSuccess
     // constructor (public payload: IWebsite){} //??
     constructor (public payload: IWebsite){}  //??
 }
-
 export class UpdateWebsiteFail implements Action {
     readonly type = WebsiteActionTypes.UpdateWebsiteFail
     constructor (public payload: string){}
 }
-
-
 export class LoadCurrentWebsite implements Action {
     readonly type = WebsiteActionTypes.LoadCurrentWebsite
     constructor (public payload: number){}
 }
-
 export class LoadCurrentWebsiteSuccess implements Action {
     readonly type = WebsiteActionTypes.LoadCurrentWebsiteSuccess
     constructor (public payload: IWebsite){}
 }
-
 export class LoadCurrentWebsiteFail implements Action {
     readonly type = WebsiteActionTypes.LoadCurrentWebsiteFail
     constructor (public payload: string){}
 }
+export class InitializeCurrentPurchase implements Action {
+    readonly type = WebsiteActionTypes.InitializeCurrentPurchase
+    constructor (){}  //no payload
+}
+export class LoadCurrentPurchase implements Action {
+    readonly type = WebsiteActionTypes.LoadCurrentPurchase
+    constructor (public payload: { websiteID: number,  purchaseID: number}){}  //websiteID: number, purchaseID: number
+}
+export class LoadCurrentPurchaseSuccess implements Action {
+    readonly type = WebsiteActionTypes.LoadCurrentPurchaseSuccess
+    constructor (public payload: IPurchase){}
+}
+export class LoadCurrentPurchaseFail implements Action {
+    readonly type = WebsiteActionTypes.LoadCurrentPurchaseFail
+    constructor (public payload: string){}
+}
+
 
 export type WebsiteActions =
           SetSearchParams
@@ -108,6 +121,9 @@ export type WebsiteActions =
         | UpdateWebsite
         | UpdateWebsiteSuccess
         | UpdateWebsiteFail
-
+	    | LoadCurrentPurchase
+	    | LoadCurrentPurchaseSuccess
+	    | LoadCurrentPurchaseFail
+	    | InitializeCurrentPurchase
 
 

@@ -8,6 +8,7 @@ import { PurchaseParameterService } from './purchase-parameter.service';
 import * as fromWebsites from './state/website.reducer';
 import * as websiteActions from './state/website.action';
 import { Store, select } from '@ngrx/store';
+import { IPurchase } from './IPurchase';
 
 @Component({
     templateUrl: './website-detail.component.html'
@@ -119,7 +120,6 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
 
     newWebsite(): void {
         this.store.dispatch(new websiteActions.InitializeCurrentWebsite);
-        // this.router.navigate(['/websites', '0', 'detail']);
     }
 
     /////////deleting
@@ -222,6 +222,26 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
         } //switch
 
     } //setMessage
+
+    goToPurchase(purchase: IPurchase): void {
+        //TODO actions for setting currentPurcase
+        if (purchase) {
+            //websiteID: number,  purchaseID
+            // this.store.dispatch(new websiteActions.LoadCurrentPurchase(purchase.websiteID, purchase.purchaseID);
+            this.store.dispatch(new websiteActions.LoadCurrentPurchase( { websiteID: purchase.websiteID,  purchaseID: purchase.purchaseID});
+        } else {  // { websiteID: number,  purchaseID: number}
+            this.store.dispatch(new websiteActions.InitializeCurrentPurchase);
+        }
+        this.router.navigate(['/websites',  'purchase']);
+    } //goToPurchase
+//    <!-- [routerLink]="['/websites', website.websiteID, 'purchase', purchase.purchaseID]" -->
+//                            <!-- [routerLink]="['/websites', 'purchase', purchase.purchaseID]"
+//                         [queryParams] = "{websiteName: website.websiteName}"> -->
+//                 <tbody>
+//                     <tr *ngFor="let purchase of website.lstPurchases"
+//                         role="button"
+//                         (click)="goToPurchase(purchase.purchaseID)"
+
     ngOnDestroy(): void {
         this.componentActive = false;
     }

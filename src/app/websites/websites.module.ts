@@ -11,7 +11,7 @@ import { SharedModule } from '../shared/shared.module';
 import { Routes, RouterModule } from '@angular/router';
 import { WebsiteService } from './website.service';
 import { WebsiteDetailResolver } from './website-detail.resolver';
-import { PurchaseResolver } from './purchase.resolver';
+// import { PurchaseResolver } from './purchase.resolver';
 import { ReactiveFormsModule } from '@angular/forms';
 import { PurchaseParameterService } from './purchase-parameter.service';
 import { StoreModule } from '@ngrx/store';
@@ -61,9 +61,10 @@ const routes: Routes = [
         },
         {
             // path: ':websiteId/purchase/:purchaseId',
-            path: 'purchase/:purchaseId',
-            component: PurchaseComponent,
-            resolve: {purchase: PurchaseResolver},
+            // path: 'purchase/:purchaseId',
+            path: 'purchase',
+            component: PurchaseComponent
+            // resolve: {purchase: PurchaseResolver},
             // children: [
             //     {
             //         path: '',
