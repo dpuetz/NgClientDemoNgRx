@@ -7,8 +7,9 @@ import { Observable, of } from "rxjs";
 import { Action, Store } from "@ngrx/store";
 import { ISearch } from "../ISearch";
 import { IWebsite, setWebsiteId } from "../IWebsite";
-import * as fromWebsites from '../state/website.reducer';
+import * as fromWebsites from './website.reducer';
 import { IPurchase } from "../IPurchase";
+import { pipe } from "@angular/core/src/render3/pipe";
 
 @Injectable()
 export class WebsiteEffects {
@@ -31,16 +32,14 @@ export class WebsiteEffects {
             // tap(val=>console.log('loadWebsites 1')),
             ofType(websiteActions.WebsiteActionTypes.Load),
             // tap(val=>console.log('loadWebsites 2')),
-            map((action: websiteActions.Load) => action.payload),
+            map((action: websiteActions.Load) => action.payload), //map
             mergeMap((searchParams: ISearch) =>
                 this.websiteService.getWebsites(searchParams)
-                    .pipe(
-                        // tap(val =>console.log('effects ',  val.length)),
-                        map(
-                            websites => (new websiteActions.LoadSuccess(websites))
-                         ),//map
-                        catchError(err => of(new websiteActions.LoadFail(err)))
-                    )//pipe
+                        .pipe(
+                            // tap(val =>console.log('effects ',  val.length)),
+                            map( websites => (new websiteActions.LoadSuccess(websites)) ),//map
+                            catchError(err => of(new websiteActions.LoadFail(err)))
+                        )//pipe
             )//mergeMap
         )//pipe
 
@@ -52,9 +51,7 @@ export class WebsiteEffects {
                 mergeMap((websiteID: number) =>
                     this.websiteService.deleteWebsite(websiteID)
                         .pipe(
-                            map(
-                                () => (new websiteActions.DeleteWebsiteSuccess(websiteID))
-                            ),//map
+                            map(() => (new websiteActions.DeleteWebsiteSuccess(websiteID))),//map
                             catchError(err => of(new websiteActions.DeleteWebsiteFail(err)))
                         )//pipe
                 )//mergeMap
@@ -69,11 +66,10 @@ export class WebsiteEffects {
                 this.websiteService.getWebsiteById(websiteID).pipe(
                     // tap(website => console.log('effects4', website)),
                     map(website => (new websiteActions.LoadCurrentWebsiteSuccess(website))),
-                    catchError(err => of(new websiteActions.LoadCurrentWebsiteFail(err))
+                    catchError(err => of(new websiteActions.LoadCurrentWebsiteFail(err)))
                 )//pipe
-        )//pipe
-        )//mergemap
-    ); //pipe
+            )//mergemap
+        ); //pipe
 
     @Effect()
     updateWebsite$: Observable<Action> = this.actions$
@@ -81,13 +77,12 @@ export class WebsiteEffects {
             ofType(websiteActions.WebsiteActionTypes.UpdateWebsite),
             map((action: websiteActions.UpdateWebsite) => action.payload),
             mergeMap((website: IWebsite) =>
-                this.websiteService.saveWebsite(website).pipe(
-                     map(websiteId => (new websiteActions.UpdateWebsiteSuccess(setWebsiteId(website, websiteId)))),
-                    catchError(err => of(new websiteActions.UpdateWebsiteFail(err))
-                )//pipe
-        )//pipe
-        )//mergemap
-    ); //pipe
+                    this.websiteService.saveWebsite(website).pipe(
+                        map(websiteId => (new websiteActions.UpdateWebsiteSuccess(setWebsiteId(website, websiteId)))),
+                        catchError(err => of(new websiteActions.UpdateWebsiteFail(err)))
+                    )//pipe
+            )//mergemap
+        ); //pipe
 
     @Effect()
     UpdatePurchase$: Observable<Action> = this.actions$
@@ -98,11 +93,10 @@ export class WebsiteEffects {
                 this.websiteService.savePurchase(purchase).pipe(
                     // tap (purchase=> console.log("effects", purchase)),
                      map(purchase => (new websiteActions.UpdatePurchaseSuccess(purchase))),
-                    catchError(err => of(new websiteActions.UpdatePurchaseFail(err))
+                    catchError(err => of(new websiteActions.UpdatePurchaseFail(err)))
                 )//pipe
-        )//pipe
-        )//mergemap
-    ); //pipe
+            )//mergemap
+        ); //pipe
 
     @Effect()
     loadCurrentPurchase$: Observable<Action> = this.actions$
@@ -113,11 +107,10 @@ export class WebsiteEffects {
             mergeMap((action) =>
                 this.websiteService.getPurchase(action.websiteID, action.purchaseID).pipe(
                     map(purchase => (new websiteActions.LoadCurrentPurchaseSuccess(purchase))),
-                    catchError(err => of(new websiteActions.LoadCurrentWebsiteFail(err))
+                    catchError(err => of(new websiteActions.LoadCurrentWebsiteFail(err)))
                 )//pipe
-        )//pipe
-        )//mergemap
-    ); //pipe
+            )//mergemap
+        ); //pipe
 
     @Effect()
     deletePurchase$: Observable<Action> = this.actions$
@@ -127,11 +120,10 @@ export class WebsiteEffects {
             mergeMap((action) =>
                 this.websiteService.deletePurchase(action.purchaseID, action.websiteID).pipe(
                      map(isDeleted => (new websiteActions.DeletePurchaseSuccess(isDeleted))),
-                    catchError(err => of(new websiteActions.DeletePurchaseFail(err))
+                    catchError(err => of(new websiteActions.DeletePurchaseFail(err)))
                 )//pipe
-        )//pipe
-        )//mergemap
-    ); //pipe
+            )//mergemap
+        ); //pipe
 
     //works, but don't need it.
     // @Effect()
