@@ -4,12 +4,12 @@ import { IUser } from './iuser';
 import { IMessage, Message } from '../shared/imessage';
 import { UserService } from './user.service';
 import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
-import { Subscription } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
-import { Store } from '@ngrx/store';
+import { debounceTime, tap, takeWhile } from 'rxjs/operators';
+import { Store, select } from '@ngrx/store';
+import * as fromUser from './state/user.reducer';
+import * as userActions from './state/user.actions';
 
 @Component({
-//   selector: 'app-users',
   templateUrl: './login.component.html'
 })
 
@@ -21,14 +21,13 @@ export class LoginComponent implements OnInit, OnDestroy  {
     usernameMsg: string;
     passwordMsg: string;
     loginForm: FormGroup;
-    private subUsername: Subscription;
-    private subPassword: Subscription;
+    componentActive = true;
 
     constructor( private router: Router,
                  private userService: UserService,
                  private fb: FormBuilder,
+                 private store: Store<fromUser.State>
                  ) {
-//  private store: Store<any>
         this.validationMessages = {
             username: {
                 required: 'Please enter your user name.'
@@ -36,34 +35,68 @@ export class LoginComponent implements OnInit, OnDestroy  {
             password: {
                 required: 'Please enter your password.'
             }
-        }//validationMessages
+        }
 
     };  //constructor
 
     ngOnInit() {
+        this.createLoginForm();
+        this.watchForLogin();
+        this.watchNameChanges();
+        this.watchPasswordChanges();
+        this.watchForErrors();
+    }
+
+    watchForLogin(): void {
+        this.store
+            .pipe(
+                    select(fromUser.getUserProfile),
+                    takeWhile(() => this.componentActive)
+                )//pipe
+            .subscribe(userProfile => {
+                if(userProfile) {
+                    console.log('login-component userProfile', JSON.stringify(userProfile));
+                    if (userProfile.isLoggedIn) {
+                        this.router.navigate(['/websites']);
+                    } else {
+                        this.badLogin();
+                    }
+                }
+            })//subscribe
+    }//watchForLogin()
+
+    createLoginForm (): void {
         this.model = {username:'Guest', password:'Password'};
         this.loginForm = this.fb.group({
             username: ['Guest', [Validators.required]],
             password: ['Password', [Validators.required]]
         });
-
+    }
+    watchNameChanges(): void {
         const usernameControl = this.loginForm.get('username');
-        this.subUsername = usernameControl.valueChanges
-                .pipe(debounceTime(100))
+        usernameControl.valueChanges
+                .pipe(
+                        debounceTime(100),
+                        takeWhile(() => this.componentActive)
+                )
                 .subscribe(value => {
                             this.setMessage(usernameControl, 'username');
                         }
         );
+    }
+
+    watchPasswordChanges():void {
         const passwordControl = this.loginForm.get('password');
-        this.subPassword = passwordControl.valueChanges
-                .pipe(debounceTime(100))
+        passwordControl.valueChanges
+                .pipe(
+                        debounceTime(100),
+                        takeWhile(() => this.componentActive)
+                    )
                 .subscribe(value => {
                             this.setMessage(passwordControl, 'password');
                         }
         );
-
-
-    } //ngOnInit
+    }
 
     setMessage(c: AbstractControl, name: string): void {
         switch (name)   {
@@ -85,25 +118,9 @@ export class LoginComponent implements OnInit, OnDestroy  {
     } //setMessage
 
     loginIn(): void {
-
         let log = Object.assign({}, this.model, this.loginForm.value);
-
-        this.userService.doLogin(log)
-            .subscribe(val =>
-                {
-                    if (val) {
-//  console.log("dispatched", this.model.username);
-//                         this.store.dispatch({
-//                             type: 'LOGIN_NAME',
-//                             payload: this.model.username
-//                         });
-                        this.router.navigate(['/websites']);
-                    } else {
-                        this.badLogin();
-                    }
-                }
-            ); //subscribe
-    }//loginIn
+        this.store.dispatch(new userActions.Login( log ));
+    }
 
     badLogin(): void {
         this.popup = new Message('alert', 'Since this is a demo, I\'ll login for you.', "onComplete", 0);
@@ -113,14 +130,24 @@ export class LoginComponent implements OnInit, OnDestroy  {
         this.router.navigate(['/websites']);
     }
 
+    watchForErrors () {
+        this.store
+            .pipe(
+                    select(fromUser.getError),
+                    takeWhile(() => this.componentActive)
+                )//pipe
+            .subscribe(err => {
+                if(err) {
+                    console.log('login-component err', JSON.stringify(err));
+                    this.store.dispatch(new userActions.ClearCurrentError());
+                    this.popup = new Message('alert', 'Sorry, an error has occurred', "", 0);
+                }
+            })//subscribe
+    }//watchForErrors
+
      ngOnDestroy() {
-            if (this.subUsername) {
-                this.subUsername.unsubscribe();
-            }
-            if (this.subPassword) {
-                this.subPassword.unsubscribe();
-            }
-     } //ngOnDestroy
+        this.componentActive = false;
+     }
 
 }//class
 

@@ -8,7 +8,6 @@ import { EffectsModule } from '@ngrx/effects';
 import { UserEffects } from './state/user.effects';
 import { ReactiveFormsModule } from '@angular/forms';
 import { UserService } from './user.service';
-// import { HomeComponent } from '../home/home-component';
 
 const userRoutes: Routes = [
   { path: '', component: LoginComponent }
@@ -26,7 +25,6 @@ const userRoutes: Routes = [
   ],
   declarations: [
     LoginComponent
-    // HomeComponent
   ],
   providers: [
     UserService
