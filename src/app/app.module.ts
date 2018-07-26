@@ -5,43 +5,64 @@ import { HttpClientModule } from '@angular/common/http';
 import { StoreModule } from '@ngrx/store';
 
 import { AppComponent } from './app.component';
-import { LoginComponent } from './login/login.component';
+// import { LoginComponent } from './users/login.component';
 import { AngularFontAwesomeModule } from 'angular-font-awesome';  //https://fontawesome.com/how-to-use/svg-with-js
 import { SharedModule } from './shared/shared.module';
 import { RouterModule, PreloadAllModules } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AppHeaderComponent } from './shared/app-header';
 import { EffectsModule } from '@ngrx/effects';
+// import { UserModule } from './user/user.module';
+import { HomeComponent } from './home/home-component';
 
-// import { reducer } from './state/app.reducer';
 
 @NgModule({
   imports: [
     BrowserModule,
-    // FormsModule,
+    // UserModule,
     SharedModule,
     AngularFontAwesomeModule,
     HttpClientModule,
     ReactiveFormsModule,
     EffectsModule.forRoot([]),
     StoreModule.forRoot({}),
-    RouterModule.forRoot([
-        { path: 'login', component: LoginComponent },
+
+    //HomeComponent
+
+    // RouterModule.forRoot([
+    //     { path: 'users', component: LoginComponent },
+    //     {
+    //         path: 'websites',
+    //         //data: { preload: false },  //this is for custom-built preloader services only, relates to lazy loading
+    //         loadChildren: './websites/websites.module#WebsitesModule'
+    //     },
+    //     { path: '', redirectTo: '/users', pathMatch: 'full'},
+    //     { path: '**', component: LoginComponent },
+    // ]
+     RouterModule.forRoot([
+         //C:\AAA\NgClientDemoNgRx\src\app\home\home-component.ts
+        { path: 'home', component: HomeComponent },
+        {
+            path: 'user',
+            //C:\AAA\NgClientDemoNgRx\src\app\user\login.component.ts
+            loadChildren: './user/user.module#UserModule'
+        },
         {
             path: 'websites',
             //data: { preload: false },  //this is for custom-built preloader services only, relates to lazy loading
+            //C:\AAA\NgClientDemoNgRx\src\app\websites\websites.module.ts
             loadChildren: './websites/websites.module#WebsitesModule'
         },
-        { path: '', redirectTo: '/login', pathMatch: 'full'},
-        { path: '**', component: LoginComponent },
+        { path: '', redirectTo: '/home', pathMatch: 'full'},
+        { path: '**', component: HomeComponent },
     ]
     , {preloadingStrategy: PreloadAllModules} )   //prod
     // , {preloadingStrategy: PreloadAllModules, enableTracing: true} ) //dev ONLY, view routing events in console.
   ],
   declarations: [
     AppComponent,
-    LoginComponent,
-    AppHeaderComponent
+    AppHeaderComponent,
+    HomeComponent
   ],
   providers: [],
   bootstrap: [AppComponent]
