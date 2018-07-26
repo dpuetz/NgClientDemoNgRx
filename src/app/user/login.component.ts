@@ -2,14 +2,14 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { IUser } from './iuser';
 import { IMessage, Message } from '../shared/imessage';
-import { LoginService } from './login.service';
+import { UserService } from './user.service';
 import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 
 @Component({
-  selector: 'app-login',
+//   selector: 'app-users',
   templateUrl: './login.component.html'
 })
 
@@ -25,10 +25,10 @@ export class LoginComponent implements OnInit, OnDestroy  {
     private subPassword: Subscription;
 
     constructor( private router: Router,
-                 private loginService: LoginService,
+                 private userService: UserService,
                  private fb: FormBuilder,
-                 private store: Store<any> ) {
-
+                 ) {
+//  private store: Store<any>
         this.validationMessages = {
             username: {
                 required: 'Please enter your user name.'
@@ -88,7 +88,7 @@ export class LoginComponent implements OnInit, OnDestroy  {
 
         let log = Object.assign({}, this.model, this.loginForm.value);
 
-        this.loginService.doLogin(log)
+        this.userService.doLogin(log)
             .subscribe(val =>
                 {
                     if (val) {

@@ -17,7 +17,7 @@ const httpOptions = {
 })
 
 
-export class LoginService {
+export class UserService {
 
     private domain = environment.baseUrl;
 
