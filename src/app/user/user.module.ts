@@ -6,17 +6,17 @@ import { StoreModule } from '@ngrx/store';
 import { userReducer } from './state/user.reducer';
 import { EffectsModule } from '@ngrx/effects';
 import { UserEffects } from './state/user.effects';
-import { ReactiveFormsModule } from '@angular/forms';
-import { UserService } from './user.service';
+// import { ReactiveFormsModule } from '@angular/forms';
+// import { UserService } from './user.service';
 
 const userRoutes: Routes = [
-  { path: '', component: LoginComponent }
+  { path: 'login', component: LoginComponent }
 ];
 
 @NgModule({
   imports: [
     SharedModule,
-    ReactiveFormsModule,
+    // ReactiveFormsModule,
     RouterModule.forChild(userRoutes),
     StoreModule.forFeature('user', userReducer),
     EffectsModule.forFeature(
@@ -27,7 +27,7 @@ const userRoutes: Routes = [
     LoginComponent
   ],
   providers: [
-    UserService
+    // UserService
   ]
 })
 export class UserModule { }

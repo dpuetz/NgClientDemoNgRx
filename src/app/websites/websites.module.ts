@@ -9,11 +9,6 @@ import { CurrencyMaskConfig, CURRENCY_MASK_CONFIG } from 'ng2-currency-mask/src/
 import { AngularFontAwesomeModule } from 'angular-font-awesome';  //https://fontawesome.com/how-to-use/svg-with-js
 import { SharedModule } from '../shared/shared.module';
 import { Routes, RouterModule } from '@angular/router';
-import { WebsiteService } from './website.service';
-// import { WebsiteDetailResolver } from './website-detail.resolver';
-// import { PurchaseResolver } from './purchase.resolver';
-import { ReactiveFormsModule } from '@angular/forms';
-import { PurchaseParameterService } from './purchase-parameter.service';
 import { StoreModule } from '@ngrx/store';
 import { reducer } from './state/website.reducer';
 import { EffectsModule } from '@ngrx/effects';
@@ -92,8 +87,7 @@ imports: [
     A2Edatetimepicker,
     RouterModule.forChild(routes),
     SharedModule,
-    ReactiveFormsModule,
-    // StoreModule.forFeature('websites', {}),
+    StoreModule.forFeature('websites', {}),
     StoreModule.forFeature('websites', reducer),  //1st arg is slice, 2nd is reducer or reducers.
     EffectsModule.forFeature(
       [ WebsiteEffects ]
@@ -103,8 +97,6 @@ imports: [
     WebsitesComponent,
     WebsiteDetailComponent,
     PurchaseComponent
-
-
   ],
 
   providers: [
@@ -112,9 +104,6 @@ imports: [
         provide: CURRENCY_MASK_CONFIG,
         useValue: CustomCurrencyMaskConfig,
     }
-    , WebsiteService
-    , PurchaseParameterService
-
 ]
 
 })

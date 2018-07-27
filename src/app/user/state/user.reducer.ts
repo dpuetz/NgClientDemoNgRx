@@ -1,5 +1,5 @@
 import * as fromRoot from '../../state/app.state';
-import { IUserProfile } from '../iuser';
+import { IUserProfile, UserProfile } from '../iuser';
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 import { UserActions, UserActionTypes } from './user.actions';
 
@@ -8,7 +8,7 @@ export interface State extends fromRoot.State {
     user: UserState
 }
 
-//interface for this slice of state
+// interface for this slice of state
 export interface UserState {
     userProfile: IUserProfile,
     error: string
@@ -21,15 +21,15 @@ const initialState: UserState = {
 }
 
 //Create a const for the entire feature slice
-const getWebsiteFeatureState = createFeatureSelector<UserState>('user');
+const getUserFeatureState = createFeatureSelector<UserState>('user');
 
 //then use that to create a selector for each in initialState
 export const getUserProfile = createSelector (
-    getWebsiteFeatureState,
+    getUserFeatureState,
     state => state.userProfile
 )
 export const getError = createSelector (
-    getWebsiteFeatureState,
+    getUserFeatureState,
     state => state.error
 );
 
@@ -49,6 +49,12 @@ export function userReducer (state = initialState, action: UserActions): UserSta
         case UserActionTypes.ClearCurrentError:
             return {
                 ...state,
+                error: ''
+            }
+        case UserActionTypes.Logout:
+            return {
+                ...state,
+                userProfile: null,
                 error: ''
             }
         default:

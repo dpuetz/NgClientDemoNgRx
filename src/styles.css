@@ -122,3 +122,17 @@ select:-webkit-autofill:focus {
   -webkit-box-shadow: 0 0 0px 1000px #000 inset;
   transition: background-color 5000s ease-in-out 0s; */
 }
+
+
+/* You can add global styles to this file, and also import other style files */
+li {
+    font-size: large;
+}
+
+div.panel-heading {
+   font-size: x-large;
+}
+
+/* body {
+  margin-top: 50px;
+} */

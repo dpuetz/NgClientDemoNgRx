@@ -5,7 +5,8 @@ export enum UserActionTypes {
     Login = '[Users] Login',
 	LoginSuccess = '[Users]Login Success',
 	LoginFail = '[Users] Login Fail',
-    ClearCurrentError = '[Users] Clear Error'
+    ClearCurrentError = '[Users] Clear Error',
+    Logout= '[Users] Logout',
 }
 
 export class Login implements Action {
@@ -24,9 +25,14 @@ export class ClearCurrentError implements Action {
     readonly type = UserActionTypes.ClearCurrentError
     constructor (){}
 }
+export class Logout implements Action {
+    readonly type = UserActionTypes.Logout
+    constructor (){}
+}
 
 export type UserActions =
           Login
         | LoginSuccess
         | LoginFail
         | ClearCurrentError
+        | Logout

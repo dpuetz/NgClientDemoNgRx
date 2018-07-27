@@ -34,8 +34,8 @@ const getWebsiteFeatureState = createFeatureSelector<WebsiteState>('websites');
 
 //then use that to create a selector for each in initialState
 export const getSearchParams = createSelector (
-    getWebsiteFeatureState,     //the above const
-    state => state.searchParams  //searchParams from initialState const
+    getWebsiteFeatureState,
+    state => state.searchParams
 );
 export const getWebsites = createSelector (
     getWebsiteFeatureState,

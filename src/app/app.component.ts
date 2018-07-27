@@ -8,6 +8,7 @@ import { Router, Event, NavigationStart, NavigationEnd, NavigationError, Navigat
 export class AppComponent {  // implements AfterContentInit
 
     loading: boolean;
+    userName: string = 'No UserName';
 
     constructor( private router:Router) {
         router.events.subscribe(
@@ -16,6 +17,11 @@ export class AppComponent {  // implements AfterContentInit
             }
         );  // subscribe
     } //constructor
+
+    onComplete(firstName: string): void {
+console.log('onComplete');
+        this.userName = firstName;
+    }
 
     checkRouterEvent(routerEvent: Event) : void {
         if (routerEvent instanceof NavigationStart) {

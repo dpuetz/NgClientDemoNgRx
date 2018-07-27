@@ -4,7 +4,7 @@ import { IWebsite, Website } from './IWebsite';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
 import { IMessage, Message } from '../shared/imessage';
 import { debounceTime, takeWhile, tap } from 'rxjs/operators';
-import { PurchaseParameterService } from './purchase-parameter.service';
+// import { PurchaseParameterService } from './purchase-parameter.service';
 import * as fromWebsites from './state/website.reducer';
 import * as websiteActions from './state/website.action';
 import { Store, select } from '@ngrx/store';
@@ -19,24 +19,25 @@ export class WebsiteDetailComponent implements OnDestroy, OnInit {
     website: IWebsite = new Website();
     popup : IMessage;
     websiteForm: FormGroup;
-    websiteNameMsg:string;
-    urlMsg: string;
+    websiteNameMsg = '';
+    urlMsg = '';
     componentActive = true;
     websiteDeleted = false;
     websiteSaved = false;
+    websiteNameDisplay = '';
 
-    get websiteNameDisplay (): string {
-        return this.purchaseParams.websiteName;
-    }
-    set websiteNameDisplay(value:string) {
-        this.purchaseParams.websiteName = value;
-    }
+    // get websiteNameDisplay (): string {
+    //     return this.purchaseParams.websiteName;
+    // }
+    // set websiteNameDisplay(value:string) {
+    //     this.purchaseParams.websiteName = value;
+    // }
 
     private validationMessages: { [key: string]: { [key: string]: string } };
 
     constructor(  private router: Router,
                   private fb: FormBuilder,
-                  private purchaseParams: PurchaseParameterService,
+                //   private purchaseParams: PurchaseParameterService,
                   private store: Store<fromWebsites.State>) {
                     // Define all of the validation messages for the form.
                     this.validationMessages = {

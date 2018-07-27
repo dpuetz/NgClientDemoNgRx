@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Website, IWebsite } from './IWebsite'
-import { ISearch } from './ISearch';
+import { ISearch, Search } from './ISearch';
 import { IMessage, Message } from '../shared/imessage';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
@@ -16,7 +16,7 @@ import { Router } from '@angular/router';
 export class WebsitesComponent implements OnInit, OnDestroy {
 
     websites: Website[];
-    search: ISearch;
+    search: ISearch = new Search();
     recordsReturned: number = 0;
     popup : IMessage;
     searchForm: FormGroup;
@@ -34,7 +34,9 @@ export class WebsitesComponent implements OnInit, OnDestroy {
                     takeWhile(() => this.componentActive)
                 )//pipe
             .subscribe(searchParams => {
-                this.search = searchParams
+                if (searchParams) {
+                    this.search = searchParams
+                }
             })//subscribe
 
         this.store
@@ -64,7 +66,7 @@ export class WebsitesComponent implements OnInit, OnDestroy {
             isBill: this.search.isBill,
             isPreferred: this.search.isPreferred
         });
-        
+
         this.getWebsites();
     }
     searchCheckboxChanged() {

@@ -1,8 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 import { IUser } from './iuser';
 import { IMessage, Message } from '../shared/imessage';
-import { UserService } from './user.service';
 import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
 import { debounceTime, tap, takeWhile } from 'rxjs/operators';
 import { Store, select } from '@ngrx/store';
@@ -15,6 +14,8 @@ import * as userActions from './state/user.actions';
 
 export class LoginComponent implements OnInit, OnDestroy  {
 
+    @Output() complete: EventEmitter<string> = new EventEmitter<string>();
+
     model: IUser;
     popup : IMessage;
     private validationMessages: { [key: string]: { [key: string]: string } };
@@ -24,7 +25,6 @@ export class LoginComponent implements OnInit, OnDestroy  {
     componentActive = true;
 
     constructor( private router: Router,
-                 private userService: UserService,
                  private fb: FormBuilder,
                  private store: Store<fromUser.State>
                  ) {
@@ -57,6 +57,7 @@ export class LoginComponent implements OnInit, OnDestroy  {
                 if(userProfile) {
                     console.log('login-component userProfile', JSON.stringify(userProfile));
                     if (userProfile.isLoggedIn) {
+                        // this.complete.emit(userProfile.firstName);
                         this.router.navigate(['/websites']);
                     } else {
                         this.badLogin();
